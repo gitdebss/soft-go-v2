@@ -1,8 +1,9 @@
-import { Clock, MapPin, Users } from "lucide-react";
+import { Clock, MapPin, MessageCircleMore, Users } from "lucide-react";
 import type { IRide } from "../models/IRide";
 import { getInitials } from "../utils/getInitials";
 import { Button } from "./Button";
 import { Badge } from "./Badge";
+import { Avatar } from "./Avatar";
 
 export const Card = (ride: IRide) => {
   let label: string = "";
@@ -27,9 +28,7 @@ export const Card = (ride: IRide) => {
     >
       <div className="flex flex-row justify-between">
         <div className="flex items-center flex-row gap-3">
-          <span className="rounded-full w-10 h-10 flex items-center justify-center bg-surface-secondary text-primary-default border border-border-default font-bold text-base">
-            {getInitials(ride.name)}
-          </span>
+          <Avatar initials={getInitials(ride.name)} />
           <p className="font-bold text-black text-base">{ride.name}</p>
         </div>
         <Badge {...badgeProps}></Badge>
@@ -67,7 +66,9 @@ export const Card = (ride: IRide) => {
             onClick={function (): void {
               throw new Error("Function not implemented.");
             }}
-          ></Button>
+          >
+            <MessageCircleMore className="text-success"/>
+          </Button>
 
           <Button
             label="Vou junto"

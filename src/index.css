@@ -8,6 +8,7 @@
   --color-suport-1: #DCA9FA;
   --color-suport-2: #E0F480;
   --color-suport-3: #ED7848;
+  --color-success: #25D366;
 
   --color-on-suport-1: #481566;
   --color-on-suport-2: #4A5612;
@@ -24,6 +25,8 @@
   --color-surface-tertiary: #F6F3F2;
 
   --color-border-default: #D0D0D0;
+
+  --shadow-default: 0px 1px 2px 0px #0000000D;;
 
   --font-main: 'Manrope', system-ui, 'Segoe UI', Roboto, sans-serif;
 }

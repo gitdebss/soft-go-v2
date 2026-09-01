@@ -7,21 +7,19 @@ interface ICheckboxProps {
 
 const styleMap = {
   active: {
-    bg: 'bg-primary-default',
-    text: 'text-on-primary',
-    border: 'border-0',
+    bg: "bg-primary-default",
+    text: "text-on-primary",
+    border: "border-0",
   },
   inactive: {
-    bg: 'bg-surface-primary',
-    text: 'text-text-primary',
-    border: 'border-border-default',
+    bg: "bg-surface-primary",
+    text: "text-text-primary",
+    border: "border-border-default",
   },
 };
 
 export const Checkbox = (props: ICheckboxProps) => {
-  const currentStyle = props.checked
-    ? styleMap.active
-    : styleMap.inactive;
+  const currentStyle = props.checked ? styleMap.active : styleMap.inactive;
 
   return (
     <label

@@ -5,6 +5,8 @@ import { Header } from "./components/Header";
 import { FilterOptions } from "./models/FilterOptions";
 import { MockRides } from "./models/MockRides";
 import { Checkbox } from "./components/Checkbox";
+import { Input } from "./components/Input";
+import { Plus } from "lucide-react";
 
 function App() {
   const [selected, setSelected] = useState<string[]>([]);
@@ -19,7 +21,17 @@ function App() {
           onClick={function (): void {
             throw new Error("Function not implemented.");
           }}
-        ></Button>
+        >
+          <Plus />
+        </Button>
+
+        <Input 
+          label={null}
+          name='filter'
+          type='date'
+          placeholder="Filtrar por data"
+          required={false}
+        ></Input>
 
         <ul className="flex gap-3">
         {FilterOptions.map((chip) => (
@@ -41,7 +53,7 @@ function App() {
 
         <ul className="grid gap-3">
         {MockRides.map((ride) => (
-          <Card {...ride}></Card>
+          <Card {...ride} key={ride.id}></Card>
         ))}
         </ul>
       </main>
