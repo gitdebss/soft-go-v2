@@ -1,11 +1,9 @@
-import { Car } from "lucide-react";
+import { CarFront } from "lucide-react";
 
 export const Header = () => {
   return (
-    <header className="sticky top-0 z-1 flex items-center w-full p-4 gap-3 bg-container-bg shadow-default h-15">
-        <span className="flex items-center justify-center w-7 h-7 rounded bg-accent-bg">
-            <Car className="w-4 h-4 text-container-bg" />
-        </span>
+    <header className="sticky top-0 z-1 flex items-center w-full p-4 gap-3 bg-surface-primary text-primary-default shadow-default h-15">
+        <CarFront className="w-6 h-6" />
 
         <h1 className="text-xl font-bold text-text-h">
             SoftGo
