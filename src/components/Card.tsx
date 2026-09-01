@@ -5,21 +5,15 @@ import { Button } from "./Button";
 import { Badge } from "./Badge";
 import { Avatar } from "./Avatar";
 
-export const Card = (ride: IRide) => {
-  let label: string = "";
-  switch (ride.transportType) {
-    case "uber":
-      label = "Uber";
-      break;
-    case "car":
-      label = "Carro";
-      break;
-    case "bus":
-      label = "Ônibus";
-      break;
-  }
+const transportLabels: Record<IRide["transportType"], string> = {
+  uber: "Uber",
+  car: "Carro",
+  bus: "Ônibus",
+};
 
-  const badgeProps = { label: label, style: ride.transportType };
+export const Card = (ride: IRide) => {
+
+  const badgeProps = { label: transportLabels[ride.transportType], style: ride.transportType };
 
   return (
     <li
