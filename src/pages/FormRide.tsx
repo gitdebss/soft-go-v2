@@ -1,26 +1,33 @@
-import {
-  CalendarClock,
-  Clock,
-  MapPin,
-  TextAlignStart,
-  Van,
-} from "lucide-react";
+import { CalendarClock, MapPin, TextAlignStart, Van } from "lucide-react";
 import { Header } from "../components/Header";
 import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { Line } from "../components/Line";
+import { RadioVehicle } from "../components/RadioVehicle";
+import { useState } from "react";
 
 function FormRide() {
+  const radioVehicleOptions = [
+    { label: "Carro", value: "car" },
+    { label: "Uber", value: "uber" },
+    { label: "Ônibus", value: "bus" },
+  ];
+
+  const [selected, setSelected] = useState<string>();
+
   return (
     <>
       <Header />
       <main className="p-4 gap-4 grid">
-        <h2 className="text-text-primary text-md font-semibold">
-          Publicar no mural
-        </h2>
-        <p className="text-text-tertiary">
-          Compartilhe sua viagem e conecte-se com colegas.
-        </p>
+        <div className="gap-1 grid mt-1 mb-1">
+          <h2 className="text-text-primary font-medium">
+            Publicar no mural
+          </h2>
+          <p className="text-text-tertiary text-sm">
+            Compartilhe sua viagem e conecte-se com colegas.
+          </p>
+        </div>
+
         <form className="p-4 gap-5 grid bg-surface-primary rounded-2xl">
           <section className="gap-4 grid">
             <div className="flex items-center text-text-secondary text-xl font-bold gap-2">
@@ -37,7 +44,7 @@ function FormRide() {
             />
             <Input
               label="Horário"
-              name="time"
+              name="hour"
               type="time"
               placeholder="Selecione a hora"
               required={true}
@@ -51,7 +58,7 @@ function FormRide() {
             <Line />
             <Input
               label="Saindo de (cidade)"
-              name="origin"
+              name="city"
               type="text"
               placeholder="Ex: São Paulo"
               required={true}
@@ -71,9 +78,25 @@ function FormRide() {
               <h3>Como?</h3>
             </div>
             <Line />
+
+            <ul className="flex gap-3">
+              {radioVehicleOptions.map((option) => (
+                <RadioVehicle
+                  key={option.value}
+                  label={option.label}
+                  value={option.value}
+                  checked={selected === option.value}
+                  onChange={() => {
+                    setSelected((prev) =>
+                      prev === option.value ? undefined : option.value,
+                    );
+                  }}
+                />
+              ))}
+            </ul>
             <Input
               label="Número de vagas"
-              name="seats"
+              name="totalSpots"
               type="number"
               placeholder="Ex: 4"
               required={true}
@@ -88,7 +111,7 @@ function FormRide() {
             <Input
               label="Observação"
               name="observation"
-              type="text"
+              type="textarea"
               placeholder="Ex: Vou passar na padaria antes, dividimos pedágio..."
               required={false}
             />

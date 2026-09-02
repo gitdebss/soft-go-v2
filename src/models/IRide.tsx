@@ -9,4 +9,5 @@ export interface IRide {
     totalSpots: number;
     occupiedSpots: number;
     transportType: string;
+    observation?: string;
 }
