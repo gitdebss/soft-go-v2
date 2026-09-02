@@ -1,4 +1,4 @@
-import { Bus, CarFront, CarTaxiFront } from "lucide-react";
+import { Bus, CarFront, CarTaxiFront, type LucideIcon } from "lucide-react";
 
 interface ICheckboxProps {
   label: string;
@@ -18,8 +18,14 @@ const styleMap = {
   },
 };
 
-export const RadioVehicle = (props: ICheckboxProps) => {
+const transportIcons: Record<string, LucideIcon> = {
+  car: CarFront,
+  uber: CarTaxiFront,
+  bus: Bus,
+};
 
+export const RadioVehicle = (props: ICheckboxProps) => {
+  const Icon = transportIcons[props.value] || (() => null);
   const currentStyle = props.checked ? styleMap.checked : styleMap.unchecked;
 
   return (
@@ -37,9 +43,7 @@ export const RadioVehicle = (props: ICheckboxProps) => {
         onChange={props.onChange}
         className="sr-only"
       />
-      {props.value === "car" && <CarFront className="h-6 w-6" />}
-      {props.value === "uber" && <CarTaxiFront className="h-6 w-6" />}
-      {props.value === "bus" && <Bus className="h-6 w-6" />}
+      {Icon && <Icon className="h-6 w-6" />}
 
       <p className="text-sm font-medium">{props.label}</p>
     </label>

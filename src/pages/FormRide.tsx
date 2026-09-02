@@ -5,6 +5,7 @@ import { Button } from "../components/Button";
 import { Line } from "../components/Line";
 import { RadioVehicle } from "../components/RadioVehicle";
 import { useState } from "react";
+import { isAfter, isBefore, isValid, parse } from "date-fns";
 
 function FormRide() {
   const radioVehicleOptions = [
@@ -14,6 +15,7 @@ function FormRide() {
   ];
 
   const [selected, setSelected] = useState<string>();
+  const [error, setError] = useState<string | undefined>();
 
   return (
     <>
@@ -41,6 +43,17 @@ function FormRide() {
               type="date"
               placeholder="Selecione a data"
               required={true}
+              onChange={(e) => {
+                const date = parse(e.target.value, "yyyy-MM-dd", new Date());
+                const dateLimit = new Date();
+                dateLimit.setFullYear(dateLimit.getFullYear() + 1);
+                if (!isValid(date) || isBefore(date, new Date()) || isAfter(date, dateLimit)) {
+                  setError("Data inválida. Por favor, insira uma data válida.");
+                } else {
+                  setError(undefined);
+                }
+              }}
+              error={error}
             />
             <Input
               label="Horário"
@@ -135,7 +148,7 @@ function FormRide() {
             label="Publicar Viagem"
             type="submit"
             style="primary"
-            onClick={() => {}}
+            onClick={() => alert("Em breve irá publicar a viagem!")}
           />
         </form>
       </main>

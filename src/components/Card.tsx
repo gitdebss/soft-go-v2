@@ -17,7 +17,7 @@ export const Card = (ride: IRide) => {
 
   return (
     <li
-      className="flex flex-col shadow-default border border-border-default rounded-xl p-5 bg-surface-primary  gap-4"
+      className="flex flex-col shadow-default border border-border-default rounded-xl p-5 bg-surface-primary gap-4"
       key={ride.id}
     >
       <div className="flex flex-row justify-between">
