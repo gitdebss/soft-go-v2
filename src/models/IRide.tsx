@@ -5,7 +5,7 @@ export interface IRide {
     city: string;
     region: string;
     name: string;
-    phone: string;
+    phone?: string;
     totalSpots: number;
     occupiedSpots: number;
     transportType: string;

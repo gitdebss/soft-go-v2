@@ -53,6 +53,7 @@ export const Card = (ride: IRide) => {
         </div>
 
         <div className="flex gap-3">
+          {ride.phone && (
           <Button
             label="WhatsApp"
             type="button"
@@ -63,6 +64,7 @@ export const Card = (ride: IRide) => {
           >
             <MessageCircleMore className="text-success"/>
           </Button>
+          )}
 
           <Button
             label="Vou junto"

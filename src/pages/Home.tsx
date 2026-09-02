@@ -14,7 +14,7 @@ function Home() {
   const navigate = useNavigate();
   return (
     <>
-      <Header></Header>
+      <Header />
       <main className="p-4 gap-4 grid">
         <Button
           label="Vou pra Soft"
@@ -31,7 +31,7 @@ function Home() {
           type='date'
           placeholder="Filtrar por data"
           required={false}
-        ></Input>
+        />
 
         <ul className="flex gap-3">
         {FilterOptions.map((chip) => (
@@ -53,7 +53,7 @@ function Home() {
 
         <ul className="grid gap-3">
         {MockRides.map((ride) => (
-          <Card {...ride} key={ride.id}></Card>
+          <Card {...ride} key={ride.id}/>
         ))}
         </ul>
       </main>

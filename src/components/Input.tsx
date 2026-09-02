@@ -4,6 +4,7 @@ interface IInputProps {
   name: string;
   placeholder: string;
   required: boolean;
+  helpText?: string; 
 }
 
 export const Input = (props: IInputProps) => {
@@ -19,6 +20,7 @@ export const Input = (props: IInputProps) => {
         required={props.required}
         className="pr-4 pl-4 pt-3.5 pb-3.5 border border-border-default text-text-tertiary bg-surface-primary rounded-xl w-full"
       />
+      {props.helpText && <p className="mt-1 text-sm text-text-secondary">{props.helpText}</p>}
     </div>
     </>
   );

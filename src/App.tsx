@@ -5,8 +5,8 @@ function App() {
   return (
     <>
       <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
     </>
   );
 }
