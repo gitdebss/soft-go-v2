@@ -8,7 +8,7 @@ import { Checkbox } from "../components/Checkbox";
 import { MockRides } from "../models/MockRides";
 import { Card } from "../components/Card";
 import { useNavigate } from "react-router-dom";
-import { isAfter, isBefore, isValid, parse } from "date-fns";
+import { isValid, parse } from "date-fns";
 
 function Home() {
   const [selected, setSelected] = useState<string[]>([]);
