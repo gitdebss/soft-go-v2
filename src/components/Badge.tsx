@@ -4,8 +4,8 @@ interface IBadgeProps {
 }
 
 const styleMap: Record<string, { bg: string; text: string }> = {
-  uber: { bg: "bg-suport-1", text: "text-on-suport-1" },
-  car: { bg: "bg-suport-2", text: "text-on-suport-2" },
+  car: { bg: "bg-suport-1", text: "text-on-suport-1" },
+  uber: { bg: "bg-suport-2", text: "text-on-suport-2" },
   bus: { bg: "bg-suport-3", text: "text-on-suport-3" },
 };
 

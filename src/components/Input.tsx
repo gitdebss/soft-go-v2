@@ -25,6 +25,7 @@ export const Input = (props: IInputProps) => {
 
       {props.type === "textarea" ? (
         <textarea
+          id={props.name}
           name={props.name}
           placeholder={props.placeholder}
           required={props.required}
@@ -33,6 +34,7 @@ export const Input = (props: IInputProps) => {
         ></textarea>
       ) : (
         <input
+          id={props.name}
           name={props.name}
           type={props.type}
           placeholder={props.placeholder}
