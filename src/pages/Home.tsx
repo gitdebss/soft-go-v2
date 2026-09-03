@@ -9,6 +9,7 @@ import { MockRides } from "../models/MockRides";
 import { Card } from "../components/Card";
 import { useNavigate } from "react-router-dom";
 import { isValid, parse } from "date-fns";
+import { LinkButton } from "../components/LinkButton";
 
 function Home() {
   const [selected, setSelected] = useState<string[]>([]);
@@ -19,16 +20,14 @@ function Home() {
     <>
       <Header />
       <main className="p-4 gap-4 grid">
-        <Button
+        <LinkButton
           label="Vou pra Soft"
-          type="button"
           style="primary"
-          onClick={() => {
-            navigate("/form-ride");
-          }}
+          isRouterLink={true}
+          url="/form-ride"
         >
           <Plus />
-        </Button>
+        </LinkButton>
 
         <Input
           label="Filtro por data"
@@ -39,9 +38,7 @@ function Home() {
           required={false}
           onChange={(e) => {
             const date = parse(e.target.value, "yyyy-MM-dd", new Date());
-            if (
-              !isValid(date)
-            ){
+            if (!isValid(date)) {
               setError("Data inválida. Por favor, insira uma data válida.");
             } else {
               setError(undefined);
