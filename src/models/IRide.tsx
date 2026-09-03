@@ -1,6 +1,6 @@
 export interface IRide {
     id: number;
-    date: Date;
+    date: string;
     hour: string;
     city: string;
     region: string;
