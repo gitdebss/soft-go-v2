@@ -1,13 +1,14 @@
+import type { TransportRideType } from "./ITransportRide";
+
 export interface IRide {
     id: number;
-    date: string;
+    date: Date;
     hour: string;
     city: string;
-    region: string;
     name: string;
+    transportType: TransportRideType;
+    complement?: string;
+    total_spots: number;
+    obs?: string;
     phone?: string;
-    totalSpots: number;
-    occupiedSpots: number;
-    transportType: string;
-    observation?: string;
 }
