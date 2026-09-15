@@ -1,4 +1,4 @@
-export interface TransportRideType {
+export interface ITransportRideType {
     id: number,
     name: string
 }

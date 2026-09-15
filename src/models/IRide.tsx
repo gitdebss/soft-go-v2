@@ -1,4 +1,4 @@
-import type { TransportRideType } from "./ITransportRide";
+import type { ITransportRideType } from "./ITransportRide";
 
 export interface IRide {
     id: number;
@@ -6,7 +6,7 @@ export interface IRide {
     hour: string;
     city: string;
     name: string;
-    transportType: TransportRideType;
+    transportType: ITransportRideType;
     complement?: string;
     total_spots: number;
     obs?: string;

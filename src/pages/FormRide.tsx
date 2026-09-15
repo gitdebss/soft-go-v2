@@ -22,9 +22,7 @@ function FormRide() {
       <Header />
       <main className="p-4 gap-4 grid">
         <div className="gap-1 grid mt-1 mb-1">
-          <h2 className="text-text-primary font-medium">
-            Publicar no mural
-          </h2>
+          <h2 className="text-text-primary font-medium">Publicar no mural</h2>
           <p className="text-text-tertiary text-sm">
             Compartilhe sua viagem e conecte-se com colegas.
           </p>
@@ -47,7 +45,11 @@ function FormRide() {
                 const date = parse(e.target.value, "yyyy-MM-dd", new Date());
                 const dateLimit = new Date();
                 dateLimit.setFullYear(dateLimit.getFullYear() + 1);
-                if (!isValid(date) || isBefore(date, new Date()) || isAfter(date, dateLimit)) {
+                if (
+                  !isValid(date) ||
+                  isBefore(date, new Date()) ||
+                  isAfter(date, dateLimit)
+                ) {
                   setError("Data inválida. Por favor, insira uma data válida.");
                 } else {
                   setError(undefined);
@@ -92,6 +94,12 @@ function FormRide() {
             </div>
             <Line />
 
+            <label
+              className="block mb-1 text-sm font-medium text-text-secondary"
+            >
+              Tipo de Transporte 
+              <span className="text-red-700"> *</span>
+            </label>
             <ul className="flex gap-3">
               {radioVehicleOptions.map((option) => (
                 <RadioVehicle

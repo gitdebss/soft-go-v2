@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { Header } from "../components/Header";
-import { Button } from "../components/Button";
 import { Input } from "../components/Input";
 import { FilterOptions } from "../models/FilterOptions";
 import { Checkbox } from "../components/Checkbox";

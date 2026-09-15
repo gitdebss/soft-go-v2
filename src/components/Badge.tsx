@@ -1,16 +1,16 @@
 interface IBadgeProps {
   label: string;
-  style: string;
+  style: number;
 }
 
-const styleMap: Record<string, { bg: string; text: string }> = {
-  car: { bg: "bg-suport-1", text: "text-on-suport-1" },
-  uber: { bg: "bg-suport-2", text: "text-on-suport-2" },
-  bus: { bg: "bg-suport-3", text: "text-on-suport-3" },
+const styleMap: Record<number, { bg: string; text: string }> = {
+  1: { bg: "bg-suport-1", text: "text-on-suport-1" },
+  2: { bg: "bg-suport-2", text: "text-on-suport-2" },
+  3: { bg: "bg-suport-3", text: "text-on-suport-3" },
 };
 
 export const Badge = (props: IBadgeProps) => {
-  const currentStyle = styleMap[props.style] || styleMap.uber;
+  const currentStyle = styleMap[props.style] || styleMap[1];
 
   return (
     <>

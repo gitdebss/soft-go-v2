@@ -7,15 +7,9 @@ import { Avatar } from "./Avatar";
 import { format } from "date-fns";
 import { LinkButton } from "./LinkButton";
 
-const transportLabels: Record<IRide["transportType"], string> = {
-  uber: "Uber",
-  car: "Carro",
-  bus: "Ônibus",
-};
-
 export const Card = (ride: IRide) => {
 
-  const badgeProps = { label: transportLabels[ride.transportType], style: ride.transportType };
+  const badgeProps = { label: ride.transportType.name, style: ride.transportType.id };
 
   return (
     <li
@@ -36,7 +30,7 @@ export const Card = (ride: IRide) => {
           <p>
             Saindo de <b>{ride.city}</b>
           </p>
-          <p className="inline text-primary-default">• {ride.region}</p>
+          <p className="inline text-primary-default">• {ride.complement}</p>
         </div>
 
         <div className="flex flex-row items-center text-sm justify-between">
@@ -49,7 +43,7 @@ export const Card = (ride: IRide) => {
           <div className="flex gap-2">
             <Users className="h-4 w-4 inline" />
             <p>
-              {ride.occupiedSpots}/{ride.totalSpots} Vagas
+              {ride.occupiedSpots}/{ride.total_spots} Vagas
             </p>
           </div>
         </div>
