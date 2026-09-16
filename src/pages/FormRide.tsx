@@ -6,12 +6,16 @@ import { Line } from "../components/Line";
 import { RadioVehicle } from "../components/RadioVehicle";
 import { useState } from "react";
 import { isAfter, isBefore, isValid, parse } from "date-fns";
+import type { CreateRide } from "../models/dto/CreateRide";
+import { RideService } from "../services/RideService";
 
 function FormRide() {
+  const rideService = new RideService()
+
   const radioVehicleOptions = [
-    { label: "Carro", value: "car" },
-    { label: "Uber", value: "uber" },
-    { label: "Ônibus", value: "bus" },
+    { label: "Carro", value: "1" },
+    { label: "Uber", value: "2" },
+    { label: "Ônibus", value: "3" },
   ];
 
   const [selected, setSelected] = useState<string>();
@@ -28,7 +32,22 @@ function FormRide() {
           </p>
         </div>
 
-        <form className="p-4 gap-5 grid bg-surface-primary rounded-2xl">
+        <form className="p-4 gap-5 grid bg-surface-primary rounded-2xl" onSubmit={(e) => { 
+          e.preventDefault()
+          const formData = new FormData(e.currentTarget)
+          const ride: CreateRide = {
+            name: String(formData.get('name') || ''),
+            date: String(formData.get('date') || ''),
+            hour: String(formData.get('hour') || ''),
+            city: String(formData.get('city') || ''),
+            complement: String(formData.get('complement') || ''),
+            transportTypeId: Number(formData.get('transportType') || ''),
+            totalSpots: Number(formData.get('totalSpots') || ''),
+            obs: String(formData.get('obs') || ''),
+            phone: String(formData.get('phone') || ''),
+          }
+          rideService.createRide(ride)
+         }}>
           <section className="gap-4 grid">
             <div className="flex items-center text-text-secondary text-xl font-bold gap-2">
               <CalendarClock />
@@ -131,7 +150,7 @@ function FormRide() {
             <Line />
             <Input
               label="Observação"
-              name="observation"
+              name="obs"
               type="textarea"
               placeholder="Ex: Vou passar na padaria antes, dividimos pedágio..."
               required={false}
@@ -156,7 +175,6 @@ function FormRide() {
             label="Publicar Viagem"
             type="submit"
             style="primary"
-            onClick={() => alert("Em breve irá publicar a viagem!")}
           />
         </form>
       </main>

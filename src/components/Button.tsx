@@ -4,7 +4,7 @@ interface IButtonProps{
     style: 'primary' | 'secondary' | 'tertiary' | 'disabled',
     disabled?: boolean,
     children?: React.ReactNode,
-    onClick:  () => void
+    onClick?:  () => void
 }
 
 const styleMap: Record<string, { bg: string; text: string }> = {

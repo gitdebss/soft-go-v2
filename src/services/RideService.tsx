@@ -1,47 +1,47 @@
-import type { ResponseRideData } from "../models/dto/ResponseRideData"
-import type { IRide } from "../models/IRide"
+import type { CreateRide } from "../models/dto/CreateRide";
+import type { ResponseRideData } from "../models/dto/ResponseData";
+import type { IRide } from "../models/IRide";
 
-const API_URL = 'http://localhost:3000/rides'
+const API_URL = "http://localhost:3000/rides";
 
-export async function getAllRides(search: string | null): Promise<ResponseRideData[]> {
+export class RideService {
+  constructor() {}
+
+  async loadRides(): Promise<IRide[]> {
+    const data = await this.getAllRides();
+
+    return data.flatMap((ride) => ride.data)
+  }
+
+  private async request<T>(url: string, options?: RequestInit): Promise<T> {
+    const response = await fetch(url, options);
+
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.status}`);
+    }
+
+    return response.json();
+  }
+
+  async getAllRides(search?: string): Promise<ResponseRideData[]> {
     const url = search
-        ? `${API_URL}?search=${encodeURIComponent(search)}`
-        : `${API_URL}`
+      ? `${API_URL}?search=${encodeURIComponent(search)}`
+      : API_URL;
 
-    const response = await fetch(url)
+    return this.request<ResponseRideData[]>(url);
+  }
 
-    if (!response.ok) {
-        throw new Error('Erro ao buscar caronas')
-    }
+  async getOneRide(id: number): Promise<ResponseRideData> {
+    return this.request<ResponseRideData>(`${API_URL}/${id}`);
+  }
 
-    return response.json()
+  async createRide(ride: CreateRide): Promise<ResponseRideData> {
+    return this.request<ResponseRideData>(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(ride),
+    });
+  }
 }
-
-export async function getOneRide(id: number): Promise<ResponseRideData> {
-    const url = `${API_URL}/${id}`
-
-    const response = await fetch(url)
-
-    if (!response.ok) {
-        throw new Error('Erro ao buscar carona')
-    }
-
-    return response.json()
-}
-
-export async function createRide(ride : IRide): Promise<ResponseRideData> {
-    const response = await fetch(`${API_URL}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(ride),
-    })
-
-    if (!response.ok) {
-        throw new Error('Erro ao criar carona')
-    }
-
-    return response.json()
-}
-

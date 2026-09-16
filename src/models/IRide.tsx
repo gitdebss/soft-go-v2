@@ -8,7 +8,9 @@ export interface IRide {
     name: string;
     transportType: ITransportRideType;
     complement?: string;
-    total_spots: number;
+    totalSpots: number;
+    occupiedSpots: number;
+    availableSpots: number;
     obs?: string;
     phone?: string;
 }
