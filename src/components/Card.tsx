@@ -7,7 +7,13 @@ import { format } from "date-fns";
 import { LinkButton } from "./LinkButton";
 import type { IRide } from "../models/IRide";
 
-export const Card = (ride: IRide) => {
+interface ICardProps{
+  ride: IRide,
+  onOpenModal: (ride:IRide) => void
+}
+
+export const Card = (props: ICardProps) => {
+  const ride = props.ride
 
   const badgeProps = { label: ride.transportType.name, style: ride.transportType.id };
 
@@ -63,9 +69,7 @@ export const Card = (ride: IRide) => {
             label="Vou junto"
             type="button"
             style="primary"
-            onClick={function (): void {
-              throw new Error("Function not implemented.");
-            }}
+            onClick={() => props.onOpenModal(ride)}
           ></Button>
         </div>
       </div>

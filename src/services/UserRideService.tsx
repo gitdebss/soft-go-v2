@@ -1,9 +1,11 @@
 import type { CreateUserRide } from "../models/dto/CreateUserRide"
-import type { ResponseUserRideData } from "../models/dto/ResponseUserRideData"
+import type { ResponseRideData } from "../models/dto/ResponseData"
 
 const API_URL = 'http://localhost:3000/user-ride'
 
-export async function getAllUsers(): Promise<ResponseUserRideData[]> {
+export class UserRideService{
+
+async getAllUsers(): Promise<ResponseRideData[]> {
     const response = await fetch(API_URL)
 
     if (!response.ok) {
@@ -13,7 +15,7 @@ export async function getAllUsers(): Promise<ResponseUserRideData[]> {
     return response.json()
 }
 
-export async function getUsersByRideId(id: number): Promise<ResponseUserRideData> {
+async getUsersByRideId(id: number): Promise<ResponseRideData> {
     const url = `${API_URL}/${id}`
 
     const response = await fetch(url)
@@ -25,7 +27,7 @@ export async function getUsersByRideId(id: number): Promise<ResponseUserRideData
     return response.json()
 }
 
-export async function createUserRide(user : CreateUserRide, id: number): Promise<ResponseUserRideData> {
+async createUserRide(user : CreateUserRide, id: number): Promise<ResponseRideData> {
     const response = await fetch(`${API_URL}/${id}`, {
         method: 'POST',
         headers: {
@@ -39,5 +41,6 @@ export async function createUserRide(user : CreateUserRide, id: number): Promise
     }
 
     return response.json()
+}
 }
 

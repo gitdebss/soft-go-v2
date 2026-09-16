@@ -8,9 +8,9 @@ export class RideService {
   constructor() {}
 
   async loadRides(): Promise<IRide[]> {
-    const data = await this.getAllRides();
+    const response = await this.getAllRides();
 
-    return data.flatMap((ride) => ride.data)
+    return response.data
   }
 
   private async request<T>(url: string, options?: RequestInit): Promise<T> {
@@ -23,12 +23,12 @@ export class RideService {
     return response.json();
   }
 
-  async getAllRides(search?: string): Promise<ResponseRideData[]> {
+  async getAllRides(search?: string): Promise<ResponseRideData> {
     const url = search
       ? `${API_URL}?search=${encodeURIComponent(search)}`
       : API_URL;
 
-    return this.request<ResponseRideData[]>(url);
+    return this.request<ResponseRideData>(url);
   }
 
   async getOneRide(id: number): Promise<ResponseRideData> {

@@ -9,22 +9,40 @@ import { isValid, parse } from "date-fns";
 import { LinkButton } from "../components/LinkButton";
 import { RideService } from "../services/RideService";
 import type { IRide } from "../models/IRide";
+import { Modal } from "../components/Modal";
 
 function Home() {
-  const rideService = new RideService()
+  const rideService = new RideService();
   const [selected, setSelected] = useState<string[]>([]);
   const [error, setError] = useState<string | undefined>();
 
-  const [rides, setRides] = useState<IRide[]>([]); 
+  const [rides, setRides] = useState<IRide[]>([]);
+  const [openModal, setModal] = useState<false | true>(false);
+  const [rideModal, setRideModal] = useState<IRide>();
 
   async function loadRides() {
-    const data = await rideService.loadRides()
-    setRides(data)
+    const data = await rideService.loadRides();
+    setRides(data);
   }
 
   useEffect(() => {
-    loadRides();
+    const load = async () => {
+      try {
+        const data = await rideService.loadRides();
+        console.log("Rides recebidas:", data);
+        setRides(data);
+      } catch (error) {
+        console.error("Erro ao carregar rides:", error);
+      }
+    };
+
+    load();
   }, []);
+
+  const handleOpenModal = (ride: IRide) => {
+    setRideModal(ride);
+    setModal(true);
+  };
 
   return (
     <>
@@ -81,10 +99,22 @@ function Home() {
 
         <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
           {rides.map((ride) => (
-            <Card {...ride} key={ride.id}></Card>
+            <Card
+              ride={ride}
+              key={ride.id}
+              onOpenModal={() => handleOpenModal(ride)}
+            ></Card>
           ))}
         </ul>
       </main>
+      {rideModal && (
+        <Modal
+          ride={rideModal}
+          open={openModal}
+          onClose={() => setModal(false)}
+          onSubmit={() => loadRides()}
+        />
+      )}
     </>
   );
 }

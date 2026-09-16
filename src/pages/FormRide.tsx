@@ -20,6 +20,7 @@ function FormRide() {
 
   const [selected, setSelected] = useState<string>();
   const [error, setError] = useState<string | undefined>();
+  //const [toast, setToast] = useState<string>('')
 
   return (
     <>
