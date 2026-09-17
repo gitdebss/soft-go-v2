@@ -21,7 +21,7 @@ function FormRide() {
     { label: "Ônibus", value: "3" },
   ];
 
-  const [selected, setSelected] = useState<string>();
+  const [selected, setSelected] = useState<string>('1');
   const [error, setError] = useState<string | undefined>();
 
   return (
@@ -138,9 +138,7 @@ function FormRide() {
                   value={option.value}
                   checked={selected === option.value}
                   onChange={() => {
-                    setSelected((prev) =>
-                      prev === option.value ? undefined : option.value,
-                    );
+                    setSelected(option.value);
                   }}
                 />
               ))}

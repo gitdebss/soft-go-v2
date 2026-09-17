@@ -19,9 +19,9 @@ const styleMap = {
 };
 
 const transportIcons: Record<string, LucideIcon> = {
-  car: CarFront,
-  uber: CarTaxiFront,
-  bus: Bus,
+  1: CarFront,
+  2: CarTaxiFront,
+  3: Bus,
 };
 
 export const RadioVehicle = (props: ICheckboxProps) => {

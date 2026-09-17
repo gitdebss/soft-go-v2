@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Road } from "lucide-react";
 import { Header } from "../components/Header";
 import { Input } from "../components/Input";
 import { FilterOptions } from "../models/FilterOptions";
@@ -24,9 +24,12 @@ function Home() {
   const loadRides = async () => {
     const filter = selected.filter(Boolean).join(",");
 
-    const rides = await rideService.loadRides(filter || undefined, selectedDate);
+    const rides = await rideService.loadRides(
+      filter || undefined,
+      selectedDate,
+    );
     setRides(rides);
-  }
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -69,11 +72,11 @@ function Home() {
           onChange={(e) => {
             const date = parse(e.target.value, "yyyy-MM-dd", new Date());
             if (!isValid(date)) {
-              setError("Data inválida. Por favor, insira uma data válida.");
+              setSelectedDate(undefined)
             } else {
+              setSelectedDate(String(date));
               setError(undefined);
             }
-            setSelectedDate(String(date))
           }}
           error={error}
         />
@@ -106,15 +109,24 @@ function Home() {
           ))}
         </ul>
 
-        <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-          {rides.map((ride) => (
-            <Card
-              ride={ride}
-              key={ride.id}
-              onOpenModal={() => handleOpenModal(ride)}
-            ></Card>
-          ))}
-        </ul>
+        {
+          (rides.length === 0) ? (
+            <div className="flex flex-col w-full justify-center h-full items-center pt-7 gap-4">
+              <Road className="h-15 w-15 text-text-secondary"/>
+              <p className="font-semibold text-xl text-text-secondary">Ops! Ainda não há corridas disponíveis.</p>
+            </div>
+          ) : (
+            <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+              {rides.map((ride) => (
+                <Card
+                  ride={ride}
+                  key={ride.id}
+                  onOpenModal={() => handleOpenModal(ride)}
+                ></Card>
+              ))}
+            </ul>
+          )
+        }
       </main>
       {rideModal && (
         <Modal
