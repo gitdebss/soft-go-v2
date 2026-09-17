@@ -7,10 +7,10 @@ const API_URL = "http://localhost:3000/rides";
 export class RideService {
   constructor() {}
 
-  async loadRides(): Promise<IRide[]> {
-    const response = await this.getAllRides();
+  async loadRides(transportType?: string, date?: string): Promise<IRide[]> {
+    const response = await this.getAllRides(transportType, date);
 
-    return response.data
+    return response.data;
   }
 
   private async request<T>(url: string, options?: RequestInit): Promise<T> {
@@ -23,10 +23,20 @@ export class RideService {
     return response.json();
   }
 
-  async getAllRides(search?: string): Promise<ResponseRideData> {
-    const url = search
-      ? `${API_URL}?search=${encodeURIComponent(search)}`
-      : API_URL;
+  async getAllRides(
+    transportType?: string,
+    date?: string,
+  ): Promise<ResponseRideData> {
+    const params = new URLSearchParams();
+    if (transportType) {
+      params.append("transportType", transportType);
+    }
+
+    if (date) {
+      params.append("date", date);
+    }
+
+    const url = params.toString() ? `${API_URL}?${params.toString()}` : API_URL;
 
     return this.request<ResponseRideData>(url);
   }

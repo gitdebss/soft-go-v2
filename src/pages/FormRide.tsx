@@ -8,9 +8,12 @@ import { useState } from "react";
 import { isAfter, isBefore, isValid, parse } from "date-fns";
 import type { CreateRide } from "../models/dto/CreateRide";
 import { RideService } from "../services/RideService";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 function FormRide() {
-  const rideService = new RideService()
+  const rideService = new RideService();
+  const navigate = useNavigate()
 
   const radioVehicleOptions = [
     { label: "Carro", value: "1" },
@@ -20,7 +23,6 @@ function FormRide() {
 
   const [selected, setSelected] = useState<string>();
   const [error, setError] = useState<string | undefined>();
-  //const [toast, setToast] = useState<string>('')
 
   return (
     <>
@@ -33,22 +35,32 @@ function FormRide() {
           </p>
         </div>
 
-        <form className="p-4 gap-5 grid bg-surface-primary rounded-2xl" onSubmit={(e) => { 
-          e.preventDefault()
-          const formData = new FormData(e.currentTarget)
-          const ride: CreateRide = {
-            name: String(formData.get('name') || ''),
-            date: String(formData.get('date') || ''),
-            hour: String(formData.get('hour') || ''),
-            city: String(formData.get('city') || ''),
-            complement: String(formData.get('complement') || ''),
-            transportTypeId: Number(formData.get('transportType') || ''),
-            totalSpots: Number(formData.get('totalSpots') || ''),
-            obs: String(formData.get('obs') || ''),
-            phone: String(formData.get('phone') || ''),
-          }
-          rideService.createRide(ride)
-         }}>
+        <form
+          className="p-4 gap-5 grid bg-surface-primary rounded-2xl"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const formData = new FormData(e.currentTarget);
+            const ride: CreateRide = {
+              name: String(formData.get("name") || ""),
+              date: String(formData.get("date") || ""),
+              hour: String(formData.get("hour") || ""),
+              city: String(formData.get("city") || ""),
+              complement: String(formData.get("complement") || ""),
+              transportTypeId: Number(formData.get("transportType") || ""),
+              totalSpots: Number(formData.get("totalSpots") || ""),
+              obs: String(formData.get("obs") || ""),
+              phone: String(formData.get("phone") || ""),
+            };
+            rideService.createRide(ride)
+              .then(() => {
+                toast.success("Corrida criada com sucesso!");
+                navigate('/')
+              })
+              .catch(() => {
+                toast.error("Erro ao criar corrida");
+              });
+          }}
+        >
           <section className="gap-4 grid">
             <div className="flex items-center text-text-secondary text-xl font-bold gap-2">
               <CalendarClock />
@@ -114,10 +126,8 @@ function FormRide() {
             </div>
             <Line />
 
-            <label
-              className="block mb-1 text-sm font-medium text-text-secondary"
-            >
-              Tipo de Transporte 
+            <label className="block mb-1 text-sm font-medium text-text-secondary">
+              Tipo de Transporte
               <span className="text-red-700"> *</span>
             </label>
             <ul className="flex gap-3">
@@ -172,11 +182,7 @@ function FormRide() {
               required={false}
             />
           </section>
-          <Button
-            label="Publicar Viagem"
-            type="submit"
-            style="primary"
-          />
+          <Button label="Publicar Viagem" type="submit" style="primary" />
         </form>
       </main>
     </>

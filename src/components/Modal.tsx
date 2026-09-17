@@ -6,6 +6,7 @@ import { Input } from "./Input";
 import { Line } from "./Line";
 import type { CreateUserRide } from "../models/dto/CreateUserRide";
 import { UserRideService } from "../services/UserRideService";
+import toast from "react-hot-toast";
 
 interface IModalProps {
   ride: IRide;
@@ -65,9 +66,14 @@ export const Modal = (props: IModalProps) => {
                 name: String(formData.get('name')),
                 phone: String(formData.get('phone'))
             }
-            userRideService.createUserRide(userRide, props.ride.id)
-            props.onClose()
-            props.onSubmit()
+            userRideService.createUserRide(userRide, props.ride.id).then(() => {
+              toast.success('Passageiro adicionado a corrida com sucesso!')
+              props.onClose()
+              props.onSubmit()
+            }).catch((error) => {
+              console.error(error)
+              toast.error('Erro ao adicionar passageiro a corrida.')
+            })
         }}>
           <Input
             label="Seu nome"

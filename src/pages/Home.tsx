@@ -14,30 +14,32 @@ import { Modal } from "../components/Modal";
 function Home() {
   const rideService = new RideService();
   const [selected, setSelected] = useState<string[]>([]);
+  const [selectedDate, setSelectedDate] = useState<string>();
   const [error, setError] = useState<string | undefined>();
 
   const [rides, setRides] = useState<IRide[]>([]);
   const [openModal, setModal] = useState<false | true>(false);
   const [rideModal, setRideModal] = useState<IRide>();
 
-  async function loadRides() {
-    const data = await rideService.loadRides();
-    setRides(data);
+  const loadRides = async () => {
+    const filter = selected.filter(Boolean).join(",");
+
+    const rides = await rideService.loadRides(filter || undefined, selectedDate);
+    setRides(rides);
   }
 
   useEffect(() => {
     const load = async () => {
       try {
-        const data = await rideService.loadRides();
+        const data = await loadRides();
         console.log("Rides recebidas:", data);
-        setRides(data);
       } catch (error) {
         console.error("Erro ao carregar rides:", error);
       }
     };
 
     load();
-  }, []);
+  }, [selected, selectedDate]);
 
   const handleOpenModal = (ride: IRide) => {
     setRideModal(ride);
@@ -71,6 +73,7 @@ function Home() {
             } else {
               setError(undefined);
             }
+            setSelectedDate(String(date))
           }}
           error={error}
         />
@@ -84,13 +87,19 @@ function Home() {
               checked={selected.includes(chip.value)}
               onChange={() => {
                 setSelected((prev) => {
-                  if (chip.value === "all") return ["all"];
+                  if (chip.value === "") {
+                    return [""];
+                  }
 
-                  const newSelected = prev.includes(chip.value)
-                    ? prev.filter((item) => item !== chip.value)
-                    : [...prev.filter((item) => item !== "all"), chip.value];
+                  if (prev.includes(chip.value)) {
+                    const newSelected = prev.filter(
+                      (item) => item !== chip.value,
+                    );
 
-                  return newSelected;
+                    return newSelected.length > 0 ? newSelected : [""];
+                  }
+
+                  return [...prev.filter((item) => item !== ""), chip.value];
                 });
               }}
             />
