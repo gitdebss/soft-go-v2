@@ -1,3 +1,4 @@
+import axios from "axios"
 import type { CreateUserRide } from "../models/dto/CreateUserRide"
 import type { ResponseRideData } from "../models/dto/ResponseData"
 
@@ -5,42 +6,22 @@ const API_URL = 'http://localhost:3000/user-ride'
 
 export class UserRideService{
 
-async getAllUsers(): Promise<ResponseRideData[]> {
-    const response = await fetch(API_URL)
+async getAllUsers(): Promise<ResponseRideData> {
+    const response = await axios.get<ResponseRideData>(API_URL)
 
-    if (!response.ok) {
-        throw new Error('Erro ao buscar usuários')
-    }
-
-    return response.json()
+    return response.data
 }
 
 async getUsersByRideId(id: number): Promise<ResponseRideData> {
-    const url = `${API_URL}/${id}`
+    const response = await axios.get<ResponseRideData>(`${API_URL}/${id}`)
 
-    const response = await fetch(url)
-
-    if (!response.ok) {
-        throw new Error('Erro ao buscar usuários')
-    }
-
-    return response.json()
+    return response.data
 }
 
 async createUserRide(user : CreateUserRide, id: number): Promise<ResponseRideData> {
-    const response = await fetch(`${API_URL}/${id}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(user),
-    })
+    const response = await axios.post(`${API_URL}/${id}`, user)
 
-    if (!response.ok) {
-        throw new Error('Erro ao adicionar passageiro na carona')
-    }
-
-    return response.json()
+    return response.data
 }
 }
 
