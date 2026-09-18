@@ -70,6 +70,7 @@ export const Card = (props: ICardProps) => {
             type="button"
             style="primary"
             onClick={() => props.onOpenModal(ride)}
+            disabled={ride.availableSpots === 0}
           ></Button>
         </div>
       </div>
