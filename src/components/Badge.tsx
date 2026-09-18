@@ -13,12 +13,10 @@ export const Badge = (props: IBadgeProps) => {
   const currentStyle = styleMap[props.style] || styleMap[1];
 
   return (
-    <>
       <span
         className={`pr-2.5 pl-2.5 pt-1 pb-1 rounded-md w-fit h-fit flex items-center ${currentStyle.bg} ${currentStyle.text} text-sm font-bold`}
       >
         {props.label}
       </span>
-    </>
   );
 };
