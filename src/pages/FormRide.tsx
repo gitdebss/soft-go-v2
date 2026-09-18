@@ -5,15 +5,17 @@ import { Button } from "../components/Button";
 import { Line } from "../components/Line";
 import { RadioVehicle } from "../components/RadioVehicle";
 import { useState } from "react";
-import { isAfter, isBefore, isValid, parse } from "date-fns";
 import type { CreateRide } from "../models/dto/CreateRide";
 import { RideService } from "../services/RideService";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { rideSchema, type RideFormData } from "../schemas/rideSchema";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 function FormRide() {
   const rideService = new RideService();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const radioVehicleOptions = [
     { label: "Carro", value: "1" },
@@ -21,8 +23,37 @@ function FormRide() {
     { label: "Ônibus", value: "3" },
   ];
 
-  const [selected, setSelected] = useState<string>('1');
-  const [error, setError] = useState<string | undefined>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RideFormData>({
+    resolver: zodResolver(rideSchema),
+    mode: "onChange",
+    defaultValues: {
+      transportTypeId: 1,
+    },
+  });
+
+  const handleFormSubmit = (data: RideFormData) => {
+    const rideData: CreateRide = {
+      ...data,
+      transportTypeId: Number(data.transportTypeId),
+      totalSpots: Number(data.totalSpots),
+    };
+
+    rideService
+      .createRide(rideData)
+      .then(() => {
+        toast.success("Corrida criada com sucesso!");
+        navigate("/");
+      })
+      .catch(() => {
+        toast.error("Erro ao criar corrida");
+      });
+  };
+
+  const [selected, setSelected] = useState<string>("1");
 
   return (
     <>
@@ -37,29 +68,7 @@ function FormRide() {
 
         <form
           className="p-4 gap-5 grid bg-surface-primary rounded-2xl"
-          onSubmit={(e) => {
-            e.preventDefault();
-            const formData = new FormData(e.currentTarget);
-            const ride: CreateRide = {
-              name: String(formData.get("name") || ""),
-              date: String(formData.get("date") || ""),
-              hour: String(formData.get("hour") || ""),
-              city: String(formData.get("city") || ""),
-              complement: String(formData.get("complement") || ""),
-              transportTypeId: Number(formData.get("transportType") || ""),
-              totalSpots: Number(formData.get("totalSpots") || ""),
-              obs: String(formData.get("obs") || ""),
-              phone: String(formData.get("phone") || ""),
-            };
-            rideService.createRide(ride)
-              .then(() => {
-                toast.success("Corrida criada com sucesso!");
-                navigate('/')
-              })
-              .catch(() => {
-                toast.error("Erro ao criar corrida");
-              });
-          }}
+          onSubmit={handleSubmit(handleFormSubmit)}
         >
           <section className="gap-4 grid">
             <div className="flex items-center text-text-secondary text-xl font-bold gap-2">
@@ -69,32 +78,19 @@ function FormRide() {
             <Line />
             <Input
               label="Data"
-              name="date"
+              {...register("date")}
               type="date"
               placeholder="Selecione a data"
               required={true}
-              onChange={(e) => {
-                const date = parse(e.target.value, "yyyy-MM-dd", new Date());
-                const dateLimit = new Date();
-                dateLimit.setFullYear(dateLimit.getFullYear() + 1);
-                if (
-                  !isValid(date) ||
-                  isBefore(date, new Date()) ||
-                  isAfter(date, dateLimit)
-                ) {
-                  setError("Data inválida. Por favor, insira uma data válida.");
-                } else {
-                  setError(undefined);
-                }
-              }}
-              error={error}
+              error={errors.date?.message}
             />
             <Input
+              {...register("hour")}
               label="Horário"
-              name="hour"
               type="time"
               placeholder="Selecione a hora"
               required={true}
+              error={errors.hour?.message}
             />
           </section>
           <section className="gap-4 grid">
@@ -104,19 +100,21 @@ function FormRide() {
             </div>
             <Line />
             <Input
+              {...register("city")}
               label="Saindo de (cidade)"
-              name="city"
               type="text"
               placeholder="Ex: São Paulo"
               required={true}
+              error={errors.city?.message}
             />
             <Input
+              {...register("complement")}
               label="Complemento (Bairro/Ponto)"
-              name="region"
               type="text"
               placeholder="Ex: Metrô Vila Madereira"
               required={false}
               helpText="Opcional para facilitar o encontro."
+              error={errors.complement?.message}
             />
           </section>
           <section className="gap-4 grid">
@@ -134,6 +132,9 @@ function FormRide() {
               {radioVehicleOptions.map((option) => (
                 <RadioVehicle
                   key={option.value}
+                  {...register("transportTypeId", {
+                    valueAsNumber: true,
+                  })}
                   label={option.label}
                   value={option.value}
                   checked={selected === option.value}
@@ -144,11 +145,14 @@ function FormRide() {
               ))}
             </ul>
             <Input
+              {...register("totalSpots", {
+                valueAsNumber: true,
+              })}
               label="Número de vagas"
-              name="totalSpots"
               type="number"
               placeholder="Ex: 4"
               required={true}
+              error={errors.totalSpots?.message}
             />
           </section>
           <section className="gap-4 grid">
@@ -158,26 +162,29 @@ function FormRide() {
             </div>
             <Line />
             <Input
+              {...register("obs")}
               label="Observação"
-              name="obs"
               type="textarea"
               placeholder="Ex: Vou passar na padaria antes, dividimos pedágio..."
               required={false}
+              error={errors.obs?.message}
             />
             <Line />
             <Input
+              {...register("name")}
               label="Seu nome"
-              name="name"
               type="text"
               placeholder="Ex: João da Silva"
               required={true}
+              error={errors.name?.message}
             />
             <Input
+              {...register("phone")}
               label="WhatsApp"
-              name="phone"
               type="text"
               placeholder="(11) 99999-9999"
               required={false}
+              error={errors.phone?.message}
             />
           </section>
           <Button label="Publicar Viagem" type="submit" style="primary" />

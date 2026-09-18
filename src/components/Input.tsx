@@ -1,10 +1,8 @@
-interface IInputProps {
+import type { InputHTMLAttributes } from "react";
+
+interface IInputProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string | null;
   hideLabel?: boolean;
-  type: string;
-  name: string;
-  placeholder: string;
-  required: boolean;
   helpText?: string;
   error?: string;
   onChange?: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
@@ -33,13 +31,7 @@ export const Input = (props: IInputProps) => {
           className="pr-4 pl-4 pt-3.5 pb-3.5 border border-border-default text-text-tertiary bg-surface-primary rounded-xl w-full resize-none"
         ></textarea>
       ) : (
-        <input
-          id={props.name}
-          name={props.name}
-          type={props.type}
-          placeholder={props.placeholder}
-          required={props.required}
-          onChange={props.onChange}
+        <input {...props}
           className="pr-4 pl-4 pt-3.5 pb-3.5 border border-border-default text-text-tertiary bg-surface-primary rounded-xl w-full"
         />
       )}
