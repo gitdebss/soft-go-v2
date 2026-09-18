@@ -7,6 +7,13 @@ import { Line } from "./Line";
 import type { CreateUserRide } from "../models/dto/CreateUserRide";
 import { UserRideService } from "../services/UserRideService";
 import toast from "react-hot-toast";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  userRideSchema,
+  type UserRideFormData,
+} from "../schemas/userRideShema";
+import { useEffect } from "react";
 
 interface IModalProps {
   ride: IRide;
@@ -16,9 +23,43 @@ interface IModalProps {
   onSubmit: () => void;
 }
 
-const userRideService = new UserRideService()
+const userRideService = new UserRideService();
 
 export const Modal = (props: IModalProps) => {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<UserRideFormData>({
+    resolver: zodResolver(userRideSchema),
+    mode: "onChange",
+  });
+
+  const handleFormSubmit = async (dataForm: UserRideFormData) => {
+    const data: CreateUserRide = {
+      ...dataForm,
+    };
+
+    await userRideService
+      .createUserRide(data, props.ride.id)
+      .then(() => {
+        toast.success("Passageiro adicionado a corrida com sucesso!");
+        props.onClose();
+        props.onSubmit();
+        reset()
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error("Erro ao adicionar passageiro a corrida.");
+      });
+  };
+
+  useEffect(() => {
+    if(!props.open)
+      reset()
+  }, [props.open, reset])
+
   return (
     <dialog
       className={
@@ -59,32 +100,19 @@ export const Modal = (props: IModalProps) => {
             </p>
           </div>
         </div>
-        <form className="grid gap-5" onSubmit={(e) => {
-            e.preventDefault()
-            const formData = new FormData(e.currentTarget)
-            const userRide: CreateUserRide = {
-                name: String(formData.get('name')),
-                phone: String(formData.get('phone'))
-            }
-            userRideService.createUserRide(userRide, props.ride.id).then(() => {
-              toast.success('Passageiro adicionado a corrida com sucesso!')
-              props.onClose()
-              props.onSubmit()
-            }).catch((error) => {
-              console.error(error)
-              toast.error('Erro ao adicionar passageiro a corrida.')
-            })
-        }}>
+        <form className="grid gap-5" onSubmit={handleSubmit(handleFormSubmit)}>
           <Input
+            error={errors.name?.message}
+            {...register('name')}
             label="Seu nome"
-            name="name"
             type="text"
             placeholder="João da Silva"
             required={true}
           />
           <Input
+            error={errors.phone?.message}
+            {...register('phone')}
             label="WhatsApp"
-            name="phone"
             type="text"
             placeholder="(11) 99999-9999"
             required={false}
@@ -93,7 +121,12 @@ export const Modal = (props: IModalProps) => {
             <CircleCheckBig />
           </Button>
 
-          <Button type="button" label="Cancelar" style="secondary" />
+          <Button
+            type="button"
+            label="Cancelar"
+            style="secondary"
+            onClick={props.onClose}
+          />
         </form>
       </div>
     </dialog>
