@@ -1,10 +1,9 @@
 import { Bus, CarFront, CarTaxiFront, type LucideIcon } from "lucide-react";
+import type { InputHTMLAttributes } from "react";
 
-interface ICheckboxProps {
+interface ICheckboxProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  value: string;
-  checked?: boolean;
-  onChange: () => void;
+  value: number;
 }
 
 const styleMap = {
@@ -24,8 +23,8 @@ const transportIcons: Record<string, LucideIcon> = {
   3: Bus,
 };
 
-export const RadioVehicle = (props: ICheckboxProps) => {
-  const Icon = transportIcons[props.value] || (() => null);
+export const RadioVehicle = ({label, value, ...props}: ICheckboxProps) => {
+  const Icon = transportIcons[value] || (() => null);
   const currentStyle = props.checked ? styleMap.checked : styleMap.unchecked;
 
   return (
@@ -36,16 +35,14 @@ export const RadioVehicle = (props: ICheckboxProps) => {
         ${currentStyle.border}`}
     >
       <input
-        name="transportType"
-        value={props.value}
+        {...props}
         type="radio"
-        checked={props.checked}
-        onChange={props.onChange}
+        value={value}
         className="sr-only"
       />
       {Icon && <Icon className="h-6 w-6" />}
 
-      <p className="text-sm font-medium">{props.label}</p>
+      <p className="text-sm font-medium">{label}</p>
     </label>
   );
 };

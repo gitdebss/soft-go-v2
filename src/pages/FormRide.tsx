@@ -12,20 +12,23 @@ import { useNavigate } from "react-router-dom";
 import { rideSchema, type RideFormData } from "../schemas/rideSchema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Textarea } from "../components/Textarea";
 
 function FormRide() {
   const rideService = new RideService();
   const navigate = useNavigate();
 
   const radioVehicleOptions = [
-    { label: "Carro", value: "1" },
-    { label: "Uber", value: "2" },
-    { label: "Ônibus", value: "3" },
+    { label: "Carro", value: 1 },
+    { label: "Uber", value: 2 },
+    { label: "Ônibus", value: 3 },
   ];
 
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<RideFormData>({
     resolver: zodResolver(rideSchema),
@@ -36,8 +39,13 @@ function FormRide() {
   });
 
   const handleFormSubmit = (data: RideFormData) => {
+    console.log(data);
+    console.log(typeof data.transportTypeId);
     const rideData: CreateRide = {
       ...data,
+      phone: data.phone?.replace(/\D/g, "") || null,
+      complement: data.complement?.trim() || null,
+      obs: data.obs?.trim() || null,
       transportTypeId: Number(data.transportTypeId),
       totalSpots: Number(data.totalSpots),
     };
@@ -53,21 +61,22 @@ function FormRide() {
       });
   };
 
-  const [selected, setSelected] = useState<string>("1");
+  const selected = watch("transportTypeId");
 
   return (
     <>
       <Header />
-      <main className="p-4 gap-4 grid">
+      <main className="p-4 gap-4 grid justify-self-center w-full max-w-2xl">
         <div className="gap-1 grid mt-1 mb-1">
           <h2 className="text-text-primary font-medium">Publicar no mural</h2>
+
           <p className="text-text-tertiary text-sm">
             Compartilhe sua viagem e conecte-se com colegas.
           </p>
         </div>
 
         <form
-          className="p-4 gap-5 grid bg-surface-primary rounded-2xl"
+          className="p-4 gap-5 grid bg-surface-primary rounded-2xl w-full"
           onSubmit={handleSubmit(handleFormSubmit)}
         >
           <section className="gap-4 grid">
@@ -128,22 +137,26 @@ function FormRide() {
               Tipo de Transporte
               <span className="text-red-700"> *</span>
             </label>
-            <ul className="flex gap-3">
+            <ul className="flex gap-3 justify-center">
               {radioVehicleOptions.map((option) => (
                 <RadioVehicle
                   key={option.value}
-                  {...register("transportTypeId", {
-                    valueAsNumber: true,
-                  })}
                   label={option.label}
                   value={option.value}
                   checked={selected === option.value}
-                  onChange={() => {
-                    setSelected(option.value);
-                  }}
+                  onChange={() =>
+                    setValue("transportTypeId", option.value, {
+                      shouldValidate: true,
+                    })
+                  }
                 />
               ))}
             </ul>
+            {errors.transportTypeId && (
+              <p className="mt-1 text-sm text-red-700">
+                {errors.transportTypeId?.message}
+              </p>
+            )}
             <Input
               {...register("totalSpots", {
                 valueAsNumber: true,
@@ -161,10 +174,9 @@ function FormRide() {
               <h3>Detalhes</h3>
             </div>
             <Line />
-            <Input
+            <Textarea
               {...register("obs")}
               label="Observação"
-              type="textarea"
               placeholder="Ex: Vou passar na padaria antes, dividimos pedágio..."
               required={false}
               error={errors.obs?.message}
