@@ -70,11 +70,14 @@ function Home() {
           placeholder="Filtrar por data"
           required={false}
           onChange={(e) => {
-            const date = parse(e.target.value, "yyyy-MM-dd", new Date());
+            const value = e.target.value;
+
+            const date = parse(value, "yyyy-MM-dd", new Date());
+
             if (!isValid(date)) {
-              setSelectedDate(undefined)
+              setSelectedDate(undefined);
             } else {
-              setSelectedDate(String(date));
+              setSelectedDate(value);
               setError(undefined);
             }
           }}
@@ -109,24 +112,24 @@ function Home() {
           ))}
         </ul>
 
-        {
-          (rides.length === 0) ? (
-            <div className="flex flex-col w-full justify-center h-full items-center pt-7 gap-4">
-              <Road className="h-15 w-15 text-text-secondary"/>
-              <p className="font-semibold text-xl text-text-secondary">Ops! Ainda não há corridas disponíveis.</p>
-            </div>
-          ) : (
-            <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-              {rides.map((ride) => (
-                <Card
-                  ride={ride}
-                  key={ride.id}
-                  onOpenModal={() => handleOpenModal(ride)}
-                ></Card>
-              ))}
-            </ul>
-          )
-        }
+        {rides.length === 0 ? (
+          <div className="flex flex-col w-full justify-center h-full items-center pt-7 gap-4">
+            <Road className="h-15 w-15 text-text-secondary" />
+            <p className="font-semibold text-xl text-text-secondary">
+              Ops! Ainda não há corridas disponíveis.
+            </p>
+          </div>
+        ) : (
+          <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+            {rides.map((ride) => (
+              <Card
+                ride={ride}
+                key={ride.id}
+                onOpenModal={() => handleOpenModal(ride)}
+              ></Card>
+            ))}
+          </ul>
+        )}
       </main>
       {rideModal && (
         <Modal

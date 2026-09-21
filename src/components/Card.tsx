@@ -43,7 +43,7 @@ export const Card = (props: ICardProps) => {
           <div className="flex gap-2">
             <Clock className="h-4 w-4" />
             <p>
-              {format(ride.date,'dd/MM/yyyy')} às {ride.hour}
+              {format(new Date(`${ride.date}T00:00:00`), 'dd/MM/yyyy')} às {ride.hour}
             </p>
           </div>
           <div className="flex gap-2">
@@ -59,7 +59,7 @@ export const Card = (props: ICardProps) => {
           <LinkButton
             label="WhatsApp"
             style="tertiary"
-            url=''
+            url={`https://wa.me/55${ride.phone}?text=Ol%C3%A1!%20Publiquei%20uma%20corrida%20no%20soft-go!%20Gostaria%20de%20ir%20comigo%3F%F0%9F%98%8A`}
           >
             <MessageCircleMore className="text-success"/>
           </LinkButton>
