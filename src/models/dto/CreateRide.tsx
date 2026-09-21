@@ -3,9 +3,9 @@ export interface CreateRide {
     date: string;
     hour: string;
     city: string;
-    complement?: string;
+    complement?: string | null;
     transportTypeId: number;
     totalSpots: number;
-    obs?: string;
-    phone?: string;
+    obs?: string | null;
+    phone?: string | null;
 }

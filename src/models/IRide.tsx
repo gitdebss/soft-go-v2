@@ -2,7 +2,7 @@ import type { ITransportRideType } from "./ITransportRide";
 
 export interface IRide {
     id: number;
-    date: Date;
+    date: string;
     hour: string;
     city: string;
     name: string;
