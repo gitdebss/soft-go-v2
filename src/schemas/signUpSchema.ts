@@ -10,12 +10,24 @@ export const signUpSchema = z
 
     email: z.string().min(1, "O e-mail é obrigatório").email("Informe um e-mail válido"),
 
+    // password/confirmPassword are validated against their trimmed length but
+    // never trimmed themselves: `.trim()` is a transform, and zodResolver
+    // submits the parsed (transformed) value, not what the user typed. If
+    // signup silently trimmed the password before hashing while login (and
+    // the backend) never trims, a password with meaningful leading/trailing
+    // whitespace would lock the user out. `.refine` validates without
+    // mutating.
     password: z
       .string()
-      .trim()
-      .min(8, "A senha deve ter pelo menos 8 caracteres"),
+      .min(8, "A senha deve ter pelo menos 8 caracteres")
+      .refine((value) => value.trim().length > 0, { message: "A senha é obrigatória" }),
 
-    confirmPassword: z.string().trim().min(1, "A confirmação de senha é obrigatória"),
+    confirmPassword: z
+      .string()
+      .min(1, "A confirmação de senha é obrigatória")
+      .refine((value) => value.trim().length > 0, {
+        message: "A confirmação de senha é obrigatória",
+      }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "As senhas não coincidem",

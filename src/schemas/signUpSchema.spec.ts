@@ -63,12 +63,18 @@ describe("signUpSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("rejects a whitespace-only password", () => {
+  it("rejects a whitespace-only password with a required message, not the min-length one", () => {
     const result = signUpSchema.safeParse(
       validData({ password: "        ", confirmPassword: "        " }),
     );
 
     expect(result.success).toBe(false);
+    if (!result.success) {
+      const passwordIssue = result.error.issues.find(
+        (issue) => issue.path.length === 1 && issue.path[0] === "password",
+      );
+      expect(passwordIssue?.message).toBe("A senha é obrigatória");
+    }
   });
 
   it("rejects a whitespace-only name", () => {
@@ -77,7 +83,7 @@ describe("signUpSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("accepts a name and password with real content surrounded by leading/trailing whitespace", () => {
+  it("accepts a name and password with real content surrounded by leading/trailing whitespace, without mutating the submitted password", () => {
     const result = signUpSchema.safeParse(
       validData({
         name: "  Ana Souza  ",
@@ -87,5 +93,14 @@ describe("signUpSchema", () => {
     );
 
     expect(result.success).toBe(true);
+    if (result.success) {
+      // name is safe to trim (display-only, no round-trip comparison).
+      expect(result.data.name).toBe("Ana Souza");
+      // password must reach the submit payload exactly as typed - trimming it
+      // here would hash a different string at signup than a later login
+      // (which never trims) would send.
+      expect(result.data.password).toBe("  password123  ");
+      expect(result.data.confirmPassword).toBe("  password123  ");
+    }
   });
 });
