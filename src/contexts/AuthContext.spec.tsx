@@ -92,6 +92,19 @@ describe("AuthContext", () => {
     expect(getMeMock).not.toHaveBeenCalled();
   });
 
+  it("has a valid, non-expired token on mount but getMe() fails -> session is cleared and isAuthenticated is false", async () => {
+    tokenStorage.setToken(buildToken(validPayload));
+    getMeMock.mockRejectedValue({ response: { status: 401 } });
+
+    const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    expect(result.current.isAuthenticated).toBe(false);
+    expect(result.current.user).toBeNull();
+    expect(tokenStorage.getToken()).toBeNull();
+  });
+
   it("signIn success stores the token and updates user/isAuthenticated", async () => {
     const token = buildToken(validPayload);
     signInMock.mockResolvedValue({ accessToken: token });

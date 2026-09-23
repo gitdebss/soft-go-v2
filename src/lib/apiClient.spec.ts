@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 const getTokenMock = vi.fn();
 const clearTokenMock = vi.fn();
@@ -38,9 +38,27 @@ function getResponseRejected(): ResponseRejected {
 }
 
 describe("apiClient", () => {
+  const originalLocation = window.location;
+
   beforeEach(() => {
     getTokenMock.mockReset();
     clearTokenMock.mockReset();
+    // window.location.href is reassigned by the 401 handler under test. jsdom
+    // logs a "Not implemented: navigation" error for a real reassignment, so
+    // it is swapped for a plain, mutable stand-in for the duration of this file.
+    Object.defineProperty(window, "location", {
+      writable: true,
+      configurable: true,
+      value: { href: "" },
+    });
+  });
+
+  afterEach(() => {
+    Object.defineProperty(window, "location", {
+      writable: true,
+      configurable: true,
+      value: originalLocation,
+    });
   });
 
   it("uses the fallback baseURL when VITE_API_URL is not set", () => {
@@ -69,19 +87,21 @@ describe("apiClient", () => {
     expect(config.headers.Authorization).toBeUndefined();
   });
 
-  it("response interceptor clears the token and rethrows on a 401 response", async () => {
+  it("response interceptor clears the token and redirects to /login on a 401 response", async () => {
     const rejected = getResponseRejected();
     const error = { response: { status: 401 } };
 
     await expect(rejected(error)).rejects.toBe(error);
     expect(clearTokenMock).toHaveBeenCalledTimes(1);
+    expect(window.location.href).toBe("/login");
   });
 
-  it("response interceptor rethrows without clearing the token on a non-401 response", async () => {
+  it("response interceptor rethrows without clearing the token or redirecting on a non-401 response", async () => {
     const rejected = getResponseRejected();
     const error = { response: { status: 500 } };
 
     await expect(rejected(error)).rejects.toBe(error);
     expect(clearTokenMock).not.toHaveBeenCalled();
+    expect(window.location.href).toBe("");
   });
 });
