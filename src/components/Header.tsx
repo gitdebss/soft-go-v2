@@ -1,5 +1,6 @@
 import { CarFront, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { Avatar } from "./Avatar";
 import { LinkButton } from "./LinkButton";
@@ -8,8 +9,24 @@ import { getInitials } from "../utils/getInitials";
 export const Header = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user, logout } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isMenuOpen]);
 
   const handleLogout = () => {
+    setIsMenuOpen(false);
     logout();
     navigate("/login");
   };
@@ -25,16 +42,34 @@ export const Header = () => {
         </div>
 
         {isAuthenticated && user ? (
-          <div className="flex items-center gap-3">
-            <Avatar initials={getInitials(user.name)} />
+          <div className="relative" ref={menuRef}>
             <button
               type="button"
-              aria-label="Sair"
-              onClick={handleLogout}
-              className="text-text-secondary hover:opacity-80 transition-opacity"
+              aria-label="Menu da conta"
+              aria-haspopup="menu"
+              aria-expanded={isMenuOpen}
+              onClick={() => setIsMenuOpen((open) => !open)}
+              className="block rounded-full hover:opacity-80 transition-opacity"
             >
-              <LogOut className="w-5 h-5" />
+              <Avatar initials={getInitials(user.name)} />
             </button>
+
+            {isMenuOpen && (
+              <div
+                role="menu"
+                className="absolute right-0 top-full mt-2 w-36 rounded-lg border border-border-default bg-surface-primary shadow-default overflow-hidden"
+              >
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-text-secondary hover:bg-surface-secondary transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sair
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="w-28">

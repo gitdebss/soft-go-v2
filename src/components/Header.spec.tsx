@@ -50,7 +50,19 @@ describe("Header", () => {
     expect(screen.getByText("AS")).toBeInTheDocument();
   });
 
-  it("calls useAuth().logout and navigates to /login when the logout action is triggered", async () => {
+  it("does not show the logout menu until the avatar is clicked", () => {
+    useAuthMock.mockReturnValue({
+      isAuthenticated: true,
+      user: { id: 1, name: "Ana Souza", email: "ana@example.com" },
+      logout: logoutMock,
+    });
+
+    renderHeader();
+
+    expect(screen.queryByRole("menuitem", { name: /sair/i })).not.toBeInTheDocument();
+  });
+
+  it("opens a menu with the logout option when the avatar is clicked", async () => {
     useAuthMock.mockReturnValue({
       isAuthenticated: true,
       user: { id: 1, name: "Ana Souza", email: "ana@example.com" },
@@ -59,10 +71,42 @@ describe("Header", () => {
     const user = userEvent.setup();
 
     renderHeader();
-    await user.click(screen.getByRole("button", { name: /sair/i }));
+    await user.click(screen.getByRole("button", { name: /menu da conta/i }));
+
+    expect(screen.getByRole("menuitem", { name: /sair/i })).toBeInTheDocument();
+  });
+
+  it("calls useAuth().logout and navigates to /login when the logout menu item is clicked", async () => {
+    useAuthMock.mockReturnValue({
+      isAuthenticated: true,
+      user: { id: 1, name: "Ana Souza", email: "ana@example.com" },
+      logout: logoutMock,
+    });
+    const user = userEvent.setup();
+
+    renderHeader();
+    await user.click(screen.getByRole("button", { name: /menu da conta/i }));
+    await user.click(screen.getByRole("menuitem", { name: /sair/i }));
 
     expect(logoutMock).toHaveBeenCalledTimes(1);
     expect(navigateMock).toHaveBeenCalledWith("/login");
+  });
+
+  it("closes the menu when clicking outside of it", async () => {
+    useAuthMock.mockReturnValue({
+      isAuthenticated: true,
+      user: { id: 1, name: "Ana Souza", email: "ana@example.com" },
+      logout: logoutMock,
+    });
+    const user = userEvent.setup();
+
+    renderHeader();
+    await user.click(screen.getByRole("button", { name: /menu da conta/i }));
+    expect(screen.getByRole("menuitem", { name: /sair/i })).toBeInTheDocument();
+
+    await user.click(document.body);
+
+    expect(screen.queryByRole("menuitem", { name: /sair/i })).not.toBeInTheDocument();
   });
 
   it("shows an 'Entrar' link pointing to /login when not authenticated", () => {
