@@ -62,4 +62,30 @@ describe("signUpSchema", () => {
 
     expect(result.success).toBe(false);
   });
+
+  it("rejects a whitespace-only password", () => {
+    const result = signUpSchema.safeParse(
+      validData({ password: "        ", confirmPassword: "        " }),
+    );
+
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a whitespace-only name", () => {
+    const result = signUpSchema.safeParse(validData({ name: "   " }));
+
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts a name and password with real content surrounded by leading/trailing whitespace", () => {
+    const result = signUpSchema.safeParse(
+      validData({
+        name: "  Ana Souza  ",
+        password: "  password123  ",
+        confirmPassword: "  password123  ",
+      }),
+    );
+
+    expect(result.success).toBe(true);
+  });
 });
