@@ -2,8 +2,7 @@ import { describe, it, expect } from "vitest";
 import { decodeJwt } from "./decodeJwt";
 
 function base64UrlEncode(input: string): string {
-  return Buffer.from(input, "utf-8")
-    .toString("base64")
+  return btoa(input)
     .replace(/\+/g, "-")
     .replace(/\//g, "_")
     .replace(/=+$/, "");
