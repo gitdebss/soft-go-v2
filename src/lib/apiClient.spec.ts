@@ -104,4 +104,22 @@ describe("apiClient", () => {
     expect(clearTokenMock).not.toHaveBeenCalled();
     expect(window.location.href).toBe("");
   });
+
+  it("response interceptor clears the token and redirects to /login on a 401 from a protected route", async () => {
+    const rejected = getResponseRejected();
+    const error = { response: { status: 401 }, config: { url: "/auth/me" } };
+
+    await expect(rejected(error)).rejects.toBe(error);
+    expect(clearTokenMock).toHaveBeenCalledTimes(1);
+    expect(window.location.href).toBe("/login");
+  });
+
+  it("response interceptor does NOT clear the token or redirect on a 401 from the login request itself", async () => {
+    const rejected = getResponseRejected();
+    const error = { response: { status: 401 }, config: { url: "/auth/login" } };
+
+    await expect(rejected(error)).rejects.toBe(error);
+    expect(clearTokenMock).not.toHaveBeenCalled();
+    expect(window.location.href).toBe("");
+  });
 });
