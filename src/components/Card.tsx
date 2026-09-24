@@ -12,10 +12,21 @@ interface ICardProps{
   onOpenModal: (ride:IRide) => void
 }
 
+// O backend já informa a relação da usuária logada com a carona, então o card
+// mostra o estado antes do clique em vez de só errar depois dele.
+function confirmationButtonState(ride: IRide): { label: string; disabled: boolean } {
+  if (ride.isOwner) return { label: "Sua carona", disabled: true };
+  if (ride.alreadyJoined) return { label: "Você já vai nessa carona", disabled: true };
+  if (ride.availableSpots === 0) return { label: "Vou junto", disabled: true };
+
+  return { label: "Vou junto", disabled: false };
+}
+
 export const Card = (props: ICardProps) => {
   const ride = props.ride
 
   const badgeProps = { label: ride.transportType.name, style: ride.transportType.id };
+  const confirmationButton = confirmationButtonState(ride);
 
   return (
     <li
@@ -66,11 +77,11 @@ export const Card = (props: ICardProps) => {
           )}
 
           <Button
-            label="Vou junto"
+            label={confirmationButton.label}
             type="button"
             style="primary"
             onClick={() => props.onOpenModal(ride)}
-            disabled={ride.availableSpots === 0}
+            disabled={confirmationButton.disabled}
           ></Button>
         </div>
       </div>
