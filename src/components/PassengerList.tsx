@@ -32,21 +32,24 @@ export const PassengerList = (props: IPassengerListProps) => {
     <ul className="grid gap-3">
       {props.passengers.map((passenger) => (
         <li key={passenger.id} className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 min-w-0">
             <Avatar initials={getInitials(passenger.name)} />
-            <p className="text-sm">{passenger.name}</p>
+            <p className="text-sm truncate">{passenger.name}</p>
           </div>
 
           {passenger.phone ? (
             <LinkButton
               label="WhatsApp"
               style="tertiary"
+              size="compact"
               url={`https://wa.me/55${passenger.phone}?text=${WHATSAPP_MESSAGE}`}
             >
-              <MessageCircleMore className="text-success" />
+              <MessageCircleMore className="text-success h-4 w-4" />
             </LinkButton>
           ) : (
-            <p className="text-sm text-text-tertiary">Telefone não informado</p>
+            <p className="text-sm text-text-tertiary shrink-0">
+              Telefone não informado
+            </p>
           )}
         </li>
       ))}

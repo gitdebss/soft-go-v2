@@ -18,8 +18,8 @@ interface ICardProps{
 
 // O backend já informa a relação da usuária logada com a carona, então o card
 // mostra o estado antes do clique em vez de só errar depois dele.
+// A dona não chega aqui: o bloco de ações inteiro não é renderizado para ela.
 function confirmationButtonState(ride: IRide): { label: string; disabled: boolean } {
-  if (ride.isOwner) return { label: "Sua carona", disabled: true };
   if (ride.alreadyJoined) return { label: "Você já vai nessa carona", disabled: true };
   if (ride.availableSpots === 0) return { label: "Vou junto", disabled: true };
 
@@ -99,25 +99,29 @@ export const Card = (props: ICardProps) => {
           </div>
         </div>
 
-        <div className="flex gap-3">
-          {ride.phone && (
-          <LinkButton
-            label="WhatsApp"
-            style="tertiary"
-            url={`https://wa.me/55${ride.phone}?text=Ol%C3%A1!%20Publiquei%20uma%20corrida%20no%20soft-go!%20Gostaria%20de%20ir%20comigo%3F%F0%9F%98%8A`}
-          >
-            <MessageCircleMore className="text-success"/>
-          </LinkButton>
-          )}
+        {/* Na própria carona não há ação a oferecer: contatar a si mesma não faz
+            sentido e confirmar presença é recusado pelo backend. */}
+        {!ride.isOwner && (
+          <div className="flex gap-3">
+            {ride.phone && (
+            <LinkButton
+              label="WhatsApp"
+              style="tertiary"
+              url={`https://wa.me/55${ride.phone}?text=Ol%C3%A1!%20Publiquei%20uma%20corrida%20no%20soft-go!%20Gostaria%20de%20ir%20comigo%3F%F0%9F%98%8A`}
+            >
+              <MessageCircleMore className="text-success"/>
+            </LinkButton>
+            )}
 
-          <Button
-            label={confirmationButton.label}
-            type="button"
-            style="primary"
-            onClick={() => props.onOpenModal(ride)}
-            disabled={confirmationButton.disabled}
-          ></Button>
-        </div>
+            <Button
+              label={confirmationButton.label}
+              type="button"
+              style="primary"
+              onClick={() => props.onOpenModal(ride)}
+              disabled={confirmationButton.disabled}
+            ></Button>
+          </div>
+        )}
 
         {ride.isOwner && (
           <div className="grid gap-3 border-t border-border-default pt-3">

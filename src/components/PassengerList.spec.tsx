@@ -34,6 +34,14 @@ describe("PassengerList", () => {
     );
   });
 
+  it("renders the contact link compact, not full width, so it sits beside the name", () => {
+    renderList({ passengers: [{ id: 1, name: "Ana Souza", phone: "51999999999" }] });
+
+    const link = screen.getByRole("link", { name: /whatsapp/i });
+    expect(link.className).toContain("w-auto");
+    expect(link.className).not.toContain("w-full");
+  });
+
   it("marks a passenger without a phone instead of rendering a link (JOIN-31)", () => {
     renderList({ passengers: [{ id: 2, name: "Sem Fone", phone: null }] });
 

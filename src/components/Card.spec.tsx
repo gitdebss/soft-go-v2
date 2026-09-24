@@ -53,11 +53,21 @@ describe("Card confirmation button", () => {
     expect(button).toBeEnabled();
   });
 
-  it('shows "Sua carona" disabled for the owner (JOIN-08)', () => {
+  it("offers the owner no action at all on her own ride (JOIN-08)", () => {
     renderCard({ isOwner: true });
 
-    const button = screen.getByRole("button", { name: /sua carona/i });
-    expect(button).toBeDisabled();
+    // Contatar a si mesma não faz sentido, e não há presença a confirmar.
+    expect(screen.queryByRole("button", { name: /vou junto/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /sua carona/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /whatsapp/i })).not.toBeInTheDocument();
+  });
+
+  it("keeps the ride details visible for the owner, only the actions are gone (JOIN-08)", () => {
+    renderCard({ isOwner: true });
+
+    expect(screen.getByText("Dona da Carona")).toBeInTheDocument();
+    expect(screen.getByText(/são leopoldo/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /ver passageiras/i })).toBeInTheDocument();
   });
 
   it('shows "Você já vai nessa carona" disabled once presence is confirmed (JOIN-07)', () => {
