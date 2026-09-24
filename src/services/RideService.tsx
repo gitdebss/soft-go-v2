@@ -1,9 +1,9 @@
-import axios from "axios";
+import { apiClient } from "../lib/apiClient";
 import type { CreateRide } from "../models/dto/CreateRide";
 import type { ResponseRideData } from "../models/dto/ResponseData";
 import type { IRide } from "../models/IRide";
 
-const API_URL = "http://localhost:3000/rides";
+const RIDES_PATH = "/rides";
 
 export class RideService {
   constructor() {}
@@ -18,21 +18,23 @@ export class RideService {
     transportType?: string,
     date?: string,
   ): Promise<ResponseRideData> {
-    //axios.*metodo*<*tipo da resposta*>(*url*,{*querys*})
-    const response = await axios.get<ResponseRideData>(API_URL, {params: {transportType, date}})
+    const response = await apiClient.get<ResponseRideData>(RIDES_PATH, {
+      params: { transportType, date },
+    });
 
     return response.data;
   }
 
   async getOneRide(id: number): Promise<ResponseRideData> {
-    const response = await axios.get<ResponseRideData>(`${API_URL}/${id}`)
+    const response = await apiClient.get<ResponseRideData>(
+      `${RIDES_PATH}/${id}`,
+    );
 
     return response.data;
   }
 
   async createRide(ride: CreateRide): Promise<ResponseRideData> {
-    //axios.*metodo*<*tipo da resposta*>(*url*, *body da requisição*)
-    const response = await axios.post<ResponseRideData>(API_URL, ride)
+    const response = await apiClient.post<ResponseRideData>(RIDES_PATH, ride);
 
     return response.data;
   }

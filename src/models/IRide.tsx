@@ -12,5 +12,7 @@ export interface IRide {
     occupiedSpots: number;
     availableSpots: number;
     obs?: string;
-    phone?: string;
+    phone?: string | null;
+    isOwner: boolean;
+    alreadyJoined: boolean;
 }
