@@ -1,4 +1,4 @@
-import { Ban, ChevronDown, ChevronUp, CircleOff, Clock, MapPin, MessageCircleMore, Users } from "lucide-react";
+import { ChevronDown, ChevronUp, CircleOff, Clock, MapPin, MessageCircleMore, Trash2, Users } from "lucide-react";
 import { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -102,7 +102,7 @@ export const Card = (props: ICardProps) => {
     // `grayscale` apaga as cores do badge de transporte e do avatar sem
     // precisar de uma variante "cancelada" dentro de cada componente filho.
     <li
-      className={`flex flex-col shadow-default border border-border-default rounded-xl p-5 gap-4 ${
+      className={`md:relative flex flex-col shadow-default border border-border-default rounded-xl p-5 gap-4 ${
         isCanceled ? "bg-surface-tertiary grayscale" : "bg-surface-primary"
       }`}
       key={ride.id}
@@ -112,7 +112,23 @@ export const Card = (props: ICardProps) => {
           <Avatar initials={getInitials(ride.name)} />
           <p className="font-bold text-black text-base">{ride.name}</p>
         </div>
-        <Badge {...badgeProps}></Badge>
+        <div className="flex items-center gap-2 shrink-0">
+          <Badge {...badgeProps}></Badge>
+
+          {/* Estado terminal: uma carona já cancelada não oferece a ação de
+              novo, e o backend responderia 409. */}
+          {ride.isOwner && !isCanceled && (
+            <button
+              type="button"
+              aria-label="Cancelar carona"
+              title="Cancelar carona"
+              onClick={() => setIsConfirmingCancel(true)}
+              className="h-8 w-8 shrink-0 rounded-full border-0 flex items-center justify-center bg-surface-tertiary text-text-secondary hover:bg-surface-secondary hover:text-red-700 transition-colors cursor-pointer"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="gap-3 flex flex-col">
@@ -191,26 +207,19 @@ export const Card = (props: ICardProps) => {
               )}
             </button>
 
+            {/* No mobile a lista abre dentro do card, que é coluna única. A
+                partir de `md` o mural vira grade, e crescer aqui esticaria a
+                linha inteira: a lista passa a flutuar sob o card. */}
             {showPassengers && (
-              <PassengerList
-                passengers={passengers}
-                isLoading={isLoadingPassengers}
-                error={passengersError}
-              />
+              <div className="md:absolute md:left-0 md:right-0 md:top-full md:z-20 md:mt-2 md:max-h-72 md:overflow-y-auto md:rounded-xl md:border md:border-border-default md:bg-surface-primary md:p-4 md:shadow-default">
+                <PassengerList
+                  passengers={passengers}
+                  isLoading={isLoadingPassengers}
+                  error={passengersError}
+                />
+              </div>
             )}
 
-            {/* Estado terminal: uma carona já cancelada não oferece a ação de
-                novo, e o backend responderia 409. */}
-            {!isCanceled && (
-              <Button
-                label="Cancelar carona"
-                type="button"
-                style="tertiary"
-                onClick={() => setIsConfirmingCancel(true)}
-              >
-                <Ban className="h-4 w-4" />
-              </Button>
-            )}
           </div>
         )}
       </div>

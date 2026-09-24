@@ -270,3 +270,35 @@ describe("Card cancel action", () => {
     expect(onCanceled).not.toHaveBeenCalled();
   });
 });
+
+describe("Card layout", () => {
+  it("puts the cancel control beside the transport badge, icon only (CANCEL-02)", () => {
+    renderCard({ isOwner: true });
+
+    const cancelButton = screen.getByRole("button", { name: /^cancelar carona$/i });
+    const badge = screen.getByText("Carro");
+
+    // O nome acessível vem do aria-label: o botão não carrega texto visível.
+    expect(cancelButton.textContent?.trim()).toBe("");
+    expect(badge.parentElement).toContainElement(cancelButton);
+  });
+
+  // Crescer dentro do card esticaria a linha inteira da grade no desktop e
+  // desalinharia os cards vizinhos.
+  it("floats the passenger list out of the card flow from md up", async () => {
+    getUsersByRideIdMock.mockResolvedValue({
+      statusCode: 200,
+      message: "Success",
+      data: [],
+    });
+    const user = userEvent.setup();
+    renderCard({ isOwner: true });
+
+    await user.click(screen.getByRole("button", { name: /ver passageiras/i }));
+
+    const emptyState = await screen.findByText(/ninguém confirmou presença ainda/i);
+
+    expect(emptyState.parentElement?.className).toContain("md:absolute");
+    expect(emptyState.parentElement?.className).toContain("md:top-full");
+  });
+});
