@@ -18,6 +18,27 @@ describe("signUpSchema", () => {
     expect(result.success).toBe(true);
   });
 
+  it("accepts an empty phone, because the field is optional (JOIN-12)", () => {
+    const result = signUpSchema.safeParse(validData({ phone: "" }));
+
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts a masked Brazilian mobile number (JOIN-12)", () => {
+    const result = signUpSchema.safeParse(validData({ phone: "(51) 99999-9999" }));
+
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects a malformed phone with the exact message (JOIN-12)", () => {
+    const result = signUpSchema.safeParse(validData({ phone: "51999" }));
+
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0].message).toBe(
+      "Informe um celular válido. Ex: (51) 99999-9999",
+    );
+  });
+
   it("rejects an empty name", () => {
     const result = signUpSchema.safeParse(validData({ name: "" }));
 

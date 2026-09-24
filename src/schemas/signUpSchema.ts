@@ -28,6 +28,17 @@ export const signUpSchema = z
       .refine((value) => value.trim().length > 0, {
         message: "A confirmação de senha é obrigatória",
       }),
+
+    // Telefone é opcional: quem não informar simplesmente não exibe botão de
+    // WhatsApp. Mesma regra e mensagem já usadas em rideSchema.
+    phone: z
+      .string()
+      .transform((value) => value.trim())
+      .refine(
+        (value) => value === "" || /^\(\d{2}\) \d{5}-\d{4}$/.test(value),
+        "Informe um celular válido. Ex: (51) 99999-9999",
+      )
+      .optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "As senhas não coincidem",
