@@ -1,27 +1,35 @@
-import axios from "axios"
-import type { CreateUserRide } from "../models/dto/CreateUserRide"
-import type { ResponseRideData } from "../models/dto/ResponseData"
+import { apiClient } from "../lib/apiClient";
+import type { IUserRide } from "../models/IUserRide";
 
-const API_URL = 'http://localhost:3000/user-ride'
+const USER_RIDE_PATH = "/user-ride";
 
-export class UserRideService{
-
-async getAllUsers(): Promise<ResponseRideData> {
-    const response = await axios.get<ResponseRideData>(API_URL)
-
-    return response.data
+interface ResponseUserRideData {
+  statusCode: number;
+  message: string;
+  data: IUserRide[];
 }
 
-async getUsersByRideId(id: number): Promise<ResponseRideData> {
-    const response = await axios.get<ResponseRideData>(`${API_URL}/${id}`)
-
-    return response.data
+interface ResponseSingleUserRideData {
+  statusCode: number;
+  message: string;
+  data: IUserRide;
 }
 
-async createUserRide(user : CreateUserRide, id: number): Promise<ResponseRideData> {
-    const response = await axios.post(`${API_URL}/${id}`, user)
+export class UserRideService {
+  async getUsersByRideId(idRide: number): Promise<ResponseUserRideData> {
+    const response = await apiClient.get<ResponseUserRideData>(
+      `${USER_RIDE_PATH}/${idRide}`,
+    );
 
-    return response.data
-}
-}
+    return response.data;
+  }
 
+  // Sem corpo: quem confirma presença é a usuária do token.
+  async createUserRide(idRide: number): Promise<ResponseSingleUserRideData> {
+    const response = await apiClient.post<ResponseSingleUserRideData>(
+      `${USER_RIDE_PATH}/${idRide}`,
+    );
+
+    return response.data;
+  }
+}
