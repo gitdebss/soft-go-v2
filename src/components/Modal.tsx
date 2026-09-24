@@ -1,19 +1,12 @@
 import { CircleCheckBig, X } from "lucide-react";
+import axios from "axios";
+import toast from "react-hot-toast";
 import type { IRide } from "../models/IRide";
 import { getInitials } from "../utils/getInitials";
+import { useAuth } from "../contexts/AuthContext";
 import { Button } from "./Button";
-import { Input } from "./Input";
 import { Line } from "./Line";
-import type { CreateUserRide } from "../models/dto/CreateUserRide";
 import { UserRideService } from "../services/UserRideService";
-import toast from "react-hot-toast";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  userRideSchema,
-  type UserRideFormData,
-} from "../schemas/userRideShema";
-import { useEffect } from "react";
 
 interface IModalProps {
   ride: IRide;
@@ -25,40 +18,36 @@ interface IModalProps {
 
 const userRideService = new UserRideService();
 
+// Formata só para exibir: o valor armazenado é sempre de dígitos (AD-002).
+function formatPhone(phone?: string | null): string | null {
+  if (!phone) return null;
+
+  const digits = phone.replace(/\D/g, "");
+
+  if (digits.length !== 11) return phone;
+
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+}
+
 export const Modal = (props: IModalProps) => {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<UserRideFormData>({
-    resolver: zodResolver(userRideSchema),
-    mode: "onChange",
-  });
+  const { user } = useAuth();
 
-  const handleFormSubmit = async (dataForm: UserRideFormData) => {
-    const data: CreateUserRide = {
-      ...dataForm,
-    };
+  const handleConfirm = async () => {
+    try {
+      await userRideService.createUserRide(props.ride.id);
+      toast.success("Presença confirmada nessa carona!");
+      props.onClose();
+      props.onSubmit();
+    } catch (error) {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.message ?? "Erro ao confirmar presença.")
+        : "Erro ao confirmar presença.";
 
-    await userRideService
-      .createUserRide(data, props.ride.id)
-      .then(() => {
-        toast.success("Passageiro adicionado a corrida com sucesso!");
-        props.onClose();
-        props.onSubmit();
-        reset()
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error("Erro ao adicionar passageiro a corrida.");
-      });
+      toast.error(message);
+    }
   };
 
-  useEffect(() => {
-    if(!props.open)
-      reset()
-  }, [props.open, reset])
+  const formattedPhone = formatPhone(user?.phone);
 
   return (
     <dialog
@@ -81,7 +70,7 @@ export const Modal = (props: IModalProps) => {
               <X />
             </button>
           </div>
-          <p>Preencha seus dados para avisar que você vai nessa carona.</p>
+          <p>Confirme sua presença nessa carona com os dados da sua conta.</p>
         </div>
         <Line />
         <div className="flex row items-center gap-3 bg-surface-secondary border-2 border-border-default rounded-xl p-3">
@@ -100,34 +89,30 @@ export const Modal = (props: IModalProps) => {
             </p>
           </div>
         </div>
-        <form className="grid gap-5" onSubmit={handleSubmit(handleFormSubmit)}>
-          <Input
-            error={errors.name?.message}
-            {...register('name')}
-            label="Seu nome"
-            type="text"
-            placeholder="João da Silva"
-            required={true}
-          />
-          <Input
-            error={errors.phone?.message}
-            {...register('phone')}
-            label="WhatsApp"
-            type="text"
-            placeholder="(11) 99999-9999"
-            required={false}
-          />
-          <Button type="submit" label="Confirmar Presença" style="primary">
-            <CircleCheckBig />
-          </Button>
 
-          <Button
-            type="button"
-            label="Cancelar"
-            style="secondary"
-            onClick={props.onClose}
-          />
-        </form>
+        <div className="grid gap-1 bg-surface-secondary border-2 border-border-default rounded-xl p-3">
+          <p className="text-text-tertiary text-sm">Você vai como</p>
+          <p className="font-bold">{user?.name}</p>
+          <p className="text-sm">
+            {formattedPhone ?? "Telefone não informado"}
+          </p>
+        </div>
+
+        <Button
+          type="button"
+          label="Confirmar Presença"
+          style="primary"
+          onClick={handleConfirm}
+        >
+          <CircleCheckBig />
+        </Button>
+
+        <Button
+          type="button"
+          label="Cancelar"
+          style="secondary"
+          onClick={props.onClose}
+        />
       </div>
     </dialog>
   );
