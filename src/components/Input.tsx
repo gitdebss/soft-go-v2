@@ -11,11 +11,16 @@ interface IInputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = (props: IInputProps) => {
+  // O `htmlFor` do label só associa se o controle tiver um `id` igual. Nem toda
+  // página passa `id`, então ele é derivado do `name` quando falta - sem isso o
+  // label não aponta para controle nenhum e leitores de tela não o anunciam.
+  const controlId = props.id ?? props.name;
+
   return (
     <div className="w-full">
       {props.label && (
         <label
-          htmlFor={props.name}
+          htmlFor={controlId}
           className={
             props.hideLabel
               ? "sr-only"
@@ -29,6 +34,7 @@ export const Input = (props: IInputProps) => {
 
       <input
         {...props}
+        id={controlId}
         className="pr-4 pl-4 pt-3.5 pb-3.5 border border-border-default text-text-tertiary bg-surface-primary rounded-xl w-full"
       />
 

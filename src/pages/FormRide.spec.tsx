@@ -59,17 +59,12 @@ describe("FormRide", () => {
     expect(screen.queryByRole("button", { name: /publicar viagem/i })).not.toBeInTheDocument();
   });
 
-  // As queries usam placeholder porque os Inputs desta página não recebem `id`,
-  // e o componente Input associa o label por `htmlFor={name}` - os labels não
-  // apontam para controle nenhum. Bug de acessibilidade pré-existente, fora do
-  // escopo desta task.
   it("renders no name or phone field, since both come from the account (JOIN-16)", () => {
     renderFormRide();
 
-    expect(screen.queryByText("Seu nome")).not.toBeInTheDocument();
-    expect(screen.queryByPlaceholderText("Ex: João da Silva")).not.toBeInTheDocument();
-    expect(screen.queryByPlaceholderText("(11) 99999-9999")).not.toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Ex: São Paulo")).toBeInTheDocument();
+    expect(screen.queryByLabelText(/seu nome/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/whatsapp/i)).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/saindo de/i)).toBeInTheDocument();
   });
 
   it("submits a body without name or phone (JOIN-16)", async () => {
@@ -80,10 +75,10 @@ describe("FormRide", () => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    await user.type(screen.getByPlaceholderText(/selecione a data/i), tomorrow.toISOString().slice(0, 10));
-    await user.type(screen.getByPlaceholderText(/selecione a hora/i), "08:00");
-    await user.type(screen.getByPlaceholderText("Ex: São Paulo"), "São Leopoldo");
-    await user.type(screen.getByPlaceholderText("Ex: 4"), "3");
+    await user.type(screen.getByLabelText(/^data/i), tomorrow.toISOString().slice(0, 10));
+    await user.type(screen.getByLabelText(/horário/i), "08:00");
+    await user.type(screen.getByLabelText(/saindo de/i), "São Leopoldo");
+    await user.type(screen.getByLabelText(/número de vagas/i), "3");
     await user.click(screen.getByRole("button", { name: /publicar viagem/i }));
 
     await waitFor(() => expect(createRideMock).toHaveBeenCalled());
