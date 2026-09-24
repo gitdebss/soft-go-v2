@@ -1,5 +1,7 @@
-import { ChevronDown, ChevronUp, CircleOff, Clock, MapPin, MessageCircleMore, Users } from "lucide-react";
+import { Ban, ChevronDown, ChevronUp, CircleOff, Clock, MapPin, MessageCircleMore, Users } from "lucide-react";
 import { useState } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
 import { getInitials } from "../utils/getInitials";
 import { Button } from "./Button";
 import { Badge } from "./Badge";
@@ -9,11 +11,14 @@ import { LinkButton } from "./LinkButton";
 import type { IRide } from "../models/IRide";
 import type { IUserRide } from "../models/IUserRide";
 import { UserRideService } from "../services/UserRideService";
+import { RideService } from "../services/RideService";
 import { PassengerList } from "./PassengerList";
+import { ConfirmCancelRideModal } from "./ConfirmCancelRideModal";
 
 interface ICardProps{
   ride: IRide,
-  onOpenModal: (ride:IRide) => void
+  onOpenModal: (ride:IRide) => void,
+  onCanceled: () => void
 }
 
 // O backend já informa a relação da usuária logada com a carona, então o card
@@ -27,6 +32,7 @@ function confirmationButtonState(ride: IRide): { label: string; disabled: boolea
 }
 
 const userRideService = new UserRideService();
+const rideService = new RideService();
 
 export const Card = (props: ICardProps) => {
   const ride = props.ride
@@ -40,6 +46,35 @@ export const Card = (props: ICardProps) => {
   const [isLoadingPassengers, setIsLoadingPassengers] = useState(false);
   const [passengersError, setPassengersError] = useState<string | undefined>();
   const [hasFetchedPassengers, setHasFetchedPassengers] = useState(false);
+  const [isConfirmingCancel, setIsConfirmingCancel] = useState(false);
+  const [isCanceling, setIsCanceling] = useState(false);
+
+  // O backend decide o desfecho pela contagem de passageiras, então o retorno
+  // para a dona muda conforme ele: uma carona que continua no mural pede que
+  // ela avise quem estava indo.
+  const handleCancelRide = async () => {
+    setIsCanceling(true);
+
+    try {
+      const response = await rideService.cancelRide(ride.id);
+
+      toast.success(
+        response.data.status === "canceled"
+          ? "Carona cancelada. Avise quem já tinha confirmado presença!"
+          : "Carona removida do mural.",
+      );
+      setIsConfirmingCancel(false);
+      props.onCanceled();
+    } catch (error) {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.message ?? "Erro ao cancelar a carona.")
+        : "Erro ao cancelar a carona.";
+
+      toast.error(message);
+    } finally {
+      setIsCanceling(false);
+    }
+  };
 
   // Busca sob demanda e uma vez só: carregar as passageiras de toda carona ao
   // montar o mural seria uma requisição por card.
@@ -163,9 +198,32 @@ export const Card = (props: ICardProps) => {
                 error={passengersError}
               />
             )}
+
+            {/* Estado terminal: uma carona já cancelada não oferece a ação de
+                novo, e o backend responderia 409. */}
+            {!isCanceled && (
+              <Button
+                label="Cancelar carona"
+                type="button"
+                style="tertiary"
+                onClick={() => setIsConfirmingCancel(true)}
+              >
+                <Ban className="h-4 w-4" />
+              </Button>
+            )}
           </div>
         )}
       </div>
+
+      {isConfirmingCancel && (
+        <ConfirmCancelRideModal
+          ride={ride}
+          open={isConfirmingCancel}
+          isSubmitting={isCanceling}
+          onClose={() => setIsConfirmingCancel(false)}
+          onConfirm={handleCancelRide}
+        />
+      )}
     </li>
   );
 };

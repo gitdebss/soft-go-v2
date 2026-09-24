@@ -4,14 +4,25 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import type { IRide } from "../models/IRide";
 
-const { getUsersByRideIdMock } = vi.hoisted(() => ({
+const { getUsersByRideIdMock, cancelRideMock } = vi.hoisted(() => ({
   getUsersByRideIdMock: vi.fn(),
+  cancelRideMock: vi.fn(),
 }));
 
 vi.mock("../services/UserRideService", () => ({
   UserRideService: class {
     getUsersByRideId = getUsersByRideIdMock;
   },
+}));
+
+vi.mock("../services/RideService", () => ({
+  RideService: class {
+    cancelRide = cancelRideMock;
+  },
+}));
+
+vi.mock("react-hot-toast", () => ({
+  default: { success: vi.fn(), error: vi.fn() },
 }));
 
 import { Card } from "./Card";
@@ -32,18 +43,22 @@ const baseRide = {
   alreadyJoined: false,
 } as IRide;
 
-function renderCard(overrides: Partial<IRide> = {}) {
+function renderCard(overrides: Partial<IRide> = {}, onCanceled = vi.fn()) {
   const ride = { ...baseRide, ...overrides } as IRide;
 
-  return render(
-    <MemoryRouter>
-      <Card ride={ride} onOpenModal={vi.fn()} />
-    </MemoryRouter>,
-  );
+  return {
+    ...render(
+      <MemoryRouter>
+        <Card ride={ride} onOpenModal={vi.fn()} onCanceled={onCanceled} />
+      </MemoryRouter>,
+    ),
+    onCanceled,
+  };
 }
 
 beforeEach(() => {
   getUsersByRideIdMock.mockReset();
+  cancelRideMock.mockReset();
 });
 
 describe("Card confirmation button", () => {
@@ -186,5 +201,72 @@ describe("Card on a canceled ride", () => {
     renderCard({ status: "canceled" });
 
     expect(screen.getByText("1/3 Vagas")).toBeInTheDocument();
+  });
+});
+
+describe("Card cancel action", () => {
+  it("offers the owner a way to cancel her own ride (CANCEL-02)", () => {
+    renderCard({ isOwner: true });
+
+    expect(
+      screen.getByRole("button", { name: /cancelar carona/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("offers it to nobody else (CANCEL-12)", () => {
+    renderCard();
+
+    expect(
+      screen.queryByRole("button", { name: /cancelar carona/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("does not offer it again on a ride already canceled (CANCEL-19)", () => {
+    renderCard({ isOwner: true, status: "canceled" });
+
+    expect(
+      screen.queryByRole("button", { name: /cancelar carona/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  // Cancelar não tem volta: o clique abre a confirmação, não o endpoint.
+  it("asks before canceling anything (CANCEL-03)", async () => {
+    const user = userEvent.setup();
+    renderCard({ isOwner: true });
+
+    await user.click(screen.getByRole("button", { name: /^cancelar carona$/i }));
+
+    expect(
+      screen.getByRole("heading", { name: /cancelar carona/i }),
+    ).toBeInTheDocument();
+    expect(cancelRideMock).not.toHaveBeenCalled();
+  });
+
+  it("cancels the ride and reloads the board once confirmed (CANCEL-04)", async () => {
+    cancelRideMock.mockResolvedValue({
+      statusCode: 200,
+      message: "Success",
+      data: { id: 7, status: "canceled" },
+    });
+    const user = userEvent.setup();
+    const { onCanceled } = renderCard({ isOwner: true });
+
+    await user.click(screen.getByRole("button", { name: /^cancelar carona$/i }));
+    await user.click(screen.getByRole("button", { name: /sim, cancelar carona/i }));
+
+    await waitFor(() => expect(cancelRideMock).toHaveBeenCalledWith(7));
+    await waitFor(() => expect(onCanceled).toHaveBeenCalledTimes(1));
+  });
+
+  it("keeps the board untouched when the cancel request fails (CANCEL-04)", async () => {
+    cancelRideMock.mockRejectedValue(new Error("network"));
+    const user = userEvent.setup();
+    const { onCanceled } = renderCard({ isOwner: true });
+
+    await user.click(screen.getByRole("button", { name: /^cancelar carona$/i }));
+    await user.click(screen.getByRole("button", { name: /sim, cancelar carona/i }));
+
+    await waitFor(() => expect(cancelRideMock).toHaveBeenCalledTimes(1));
+    expect(onCanceled).not.toHaveBeenCalled();
   });
 });

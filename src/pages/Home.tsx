@@ -137,6 +137,7 @@ function Home() {
                 ride={ride}
                 key={ride.id}
                 onOpenModal={() => handleOpenModal(ride)}
+                onCanceled={() => loadRides()}
               ></Card>
             ))}
           </ul>
