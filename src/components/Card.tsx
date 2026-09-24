@@ -1,4 +1,5 @@
-import { Clock, MapPin, MessageCircleMore, Users } from "lucide-react";
+import { ChevronDown, ChevronUp, Clock, MapPin, MessageCircleMore, Users } from "lucide-react";
+import { useState } from "react";
 import { getInitials } from "../utils/getInitials";
 import { Button } from "./Button";
 import { Badge } from "./Badge";
@@ -6,6 +7,9 @@ import { Avatar } from "./Avatar";
 import { format } from "date-fns";
 import { LinkButton } from "./LinkButton";
 import type { IRide } from "../models/IRide";
+import type { IUserRide } from "../models/IUserRide";
+import { UserRideService } from "../services/UserRideService";
+import { PassengerList } from "./PassengerList";
 
 interface ICardProps{
   ride: IRide,
@@ -22,11 +26,41 @@ function confirmationButtonState(ride: IRide): { label: string; disabled: boolea
   return { label: "Vou junto", disabled: false };
 }
 
+const userRideService = new UserRideService();
+
 export const Card = (props: ICardProps) => {
   const ride = props.ride
 
   const badgeProps = { label: ride.transportType.name, style: ride.transportType.id };
   const confirmationButton = confirmationButtonState(ride);
+
+  const [showPassengers, setShowPassengers] = useState(false);
+  const [passengers, setPassengers] = useState<IUserRide[]>([]);
+  const [isLoadingPassengers, setIsLoadingPassengers] = useState(false);
+  const [passengersError, setPassengersError] = useState<string | undefined>();
+  const [hasFetchedPassengers, setHasFetchedPassengers] = useState(false);
+
+  // Busca sob demanda e uma vez só: carregar as passageiras de toda carona ao
+  // montar o mural seria uma requisição por card.
+  const handleTogglePassengers = async () => {
+    const willOpen = !showPassengers;
+    setShowPassengers(willOpen);
+
+    if (!willOpen || hasFetchedPassengers) return;
+
+    setIsLoadingPassengers(true);
+    setPassengersError(undefined);
+
+    try {
+      const response = await userRideService.getUsersByRideId(ride.id);
+      setPassengers(response.data);
+      setHasFetchedPassengers(true);
+    } catch {
+      setPassengersError("Erro ao carregar passageiras.");
+    } finally {
+      setIsLoadingPassengers(false);
+    }
+  };
 
   return (
     <li
@@ -84,6 +118,32 @@ export const Card = (props: ICardProps) => {
             disabled={confirmationButton.disabled}
           ></Button>
         </div>
+
+        {ride.isOwner && (
+          <div className="grid gap-3 border-t border-border-default pt-3">
+            <button
+              type="button"
+              aria-expanded={showPassengers}
+              onClick={handleTogglePassengers}
+              className="flex items-center justify-between text-sm text-primary-default font-medium"
+            >
+              Ver passageiras
+              {showPassengers ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </button>
+
+            {showPassengers && (
+              <PassengerList
+                passengers={passengers}
+                isLoading={isLoadingPassengers}
+                error={passengersError}
+              />
+            )}
+          </div>
+        )}
       </div>
     </li>
   );

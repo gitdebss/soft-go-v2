@@ -1,7 +1,19 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import type { IRide } from "../models/IRide";
+
+const { getUsersByRideIdMock } = vi.hoisted(() => ({
+  getUsersByRideIdMock: vi.fn(),
+}));
+
+vi.mock("../services/UserRideService", () => ({
+  UserRideService: class {
+    getUsersByRideId = getUsersByRideIdMock;
+  },
+}));
+
 import { Card } from "./Card";
 
 const baseRide = {
@@ -28,6 +40,10 @@ function renderCard(overrides: Partial<IRide> = {}) {
     </MemoryRouter>,
   );
 }
+
+beforeEach(() => {
+  getUsersByRideIdMock.mockReset();
+});
 
 describe("Card confirmation button", () => {
   it('offers "Vou junto" enabled when there are seats and no relation to the ride (JOIN-07)', () => {
@@ -76,5 +92,47 @@ describe("Card owner contact", () => {
     expect(screen.queryByRole("link", { name: /whatsapp/i })).not.toBeInTheDocument();
     expect(screen.getByText("Dona da Carona")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /vou junto/i })).toBeInTheDocument();
+  });
+});
+
+describe("Card passenger list", () => {
+  it("hides the trigger on rides the viewer does not own (JOIN-26)", () => {
+    renderCard({ isOwner: false });
+
+    expect(screen.queryByRole("button", { name: /ver passageiras/i })).not.toBeInTheDocument();
+    expect(getUsersByRideIdMock).not.toHaveBeenCalled();
+  });
+
+  it("fetches the passengers of that ride once when the owner expands it (JOIN-21)", async () => {
+    getUsersByRideIdMock.mockResolvedValue({
+      statusCode: 200,
+      message: "Success",
+      data: [{ id: 1, name: "Ana Souza", phone: "51999999999" }],
+    });
+    const user = userEvent.setup();
+    renderCard({ isOwner: true });
+
+    await user.click(screen.getByRole("button", { name: /ver passageiras/i }));
+
+    await waitFor(() => expect(screen.getByText("Ana Souza")).toBeInTheDocument());
+    expect(getUsersByRideIdMock).toHaveBeenCalledWith(7);
+
+    await user.click(screen.getByRole("button", { name: /ver passageiras/i }));
+    await user.click(screen.getByRole("button", { name: /ver passageiras/i }));
+
+    expect(getUsersByRideIdMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows an error message and keeps the card usable when the fetch fails (JOIN-21)", async () => {
+    getUsersByRideIdMock.mockRejectedValue(new Error("network"));
+    const user = userEvent.setup();
+    renderCard({ isOwner: true });
+
+    await user.click(screen.getByRole("button", { name: /ver passageiras/i }));
+
+    await waitFor(() =>
+      expect(screen.getByText("Erro ao carregar passageiras.")).toBeInTheDocument(),
+    );
+    expect(screen.getByText("Dona da Carona")).toBeInTheDocument();
   });
 });
