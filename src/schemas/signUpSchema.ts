@@ -35,7 +35,7 @@ export const signUpSchema = z
       .string()
       .transform((value) => value.trim())
       .refine(
-        (value) => value === "" || /^\(\d{2}\) \d{5}-\d{4}$/.test(value),
+        (value) => value === "" || /^\(\d{2}\) 9\d{4}-\d{4}$/.test(value),
         "Informe um celular válido. Ex: (51) 99999-9999",
       )
       .optional(),

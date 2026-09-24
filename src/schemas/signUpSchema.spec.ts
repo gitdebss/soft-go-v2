@@ -30,6 +30,12 @@ describe("signUpSchema", () => {
     expect(result.success).toBe(true);
   });
 
+  it("rejects a mobile number that does not start with 9 after the area code (JOIN-12)", () => {
+    const result = signUpSchema.safeParse(validData({ phone: "(51) 88888-8888" }));
+
+    expect(result.success).toBe(false);
+  });
+
   it("rejects a malformed phone with the exact message (JOIN-12)", () => {
     const result = signUpSchema.safeParse(validData({ phone: "51999" }));
 
