@@ -5,7 +5,7 @@ import { Input } from "../components/Input";
 import { FilterOptions } from "../models/FilterOptions";
 import { Checkbox } from "../components/Checkbox";
 import { Card } from "../components/Card";
-import { isValid, parse } from "date-fns";
+import { format, isValid, parse } from "date-fns";
 import { LinkButton } from "../components/LinkButton";
 import { RideService } from "../services/RideService";
 import type { IRide } from "../models/IRide";
@@ -22,6 +22,10 @@ function Home() {
   const [error, setError] = useState<string | undefined>();
 
   const [rides, setRides] = useState<IRide[]>([]);
+
+  // O mural não lista caronas cuja data já passou, então escolher um dia
+  // anterior a hoje só levaria ao estado vazio.
+  const today = format(new Date(), "yyyy-MM-dd");
   const [openModal, setModal] = useState<false | true>(false);
   const [rideModal, setRideModal] = useState<IRide>();
 
@@ -80,6 +84,7 @@ function Home() {
           type="date"
           placeholder="Filtrar por data"
           required={false}
+          min={today}
           onChange={(e) => {
             const value = e.target.value;
 

@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
+import { format } from "date-fns";
 import type { IRide } from "../models/IRide";
 
 const { loadRidesMock, navigateMock, useAuthMock } = vi.hoisted(() => ({
@@ -60,6 +61,17 @@ describe("Home", () => {
       isAuthenticated: true,
       user: { id: 2, name: "Ana Souza", email: "ana@example.com", phone: null },
     });
+  });
+
+  // O mural não lista caronas de datas passadas, então o seletor não deve
+  // oferecer um dia que só pode levar ao estado vazio.
+  it("does not let the date filter reach back before today (PAST-05)", () => {
+    renderHome();
+
+    const filter = screen.getByLabelText(/filtro por data/i);
+    const today = format(new Date(), "yyyy-MM-dd");
+
+    expect(filter).toHaveAttribute("min", today);
   });
 
   it("navigates to /login without opening the modal when there is no session (JOIN-03)", async () => {
