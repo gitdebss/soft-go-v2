@@ -10,8 +10,12 @@ import { LinkButton } from "../components/LinkButton";
 import { RideService } from "../services/RideService";
 import type { IRide } from "../models/IRide";
 import { Modal } from "../components/Modal";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const rideService = new RideService();
   const [selected, setSelected] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>();
@@ -44,7 +48,14 @@ function Home() {
     load();
   }, [selected, selectedDate]);
 
+  // Confirmar presença depende de saber quem é a usuária: sem sessão, o modal
+  // nem chega a abrir.
   const handleOpenModal = (ride: IRide) => {
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+
     setRideModal(ride);
     setModal(true);
   };
