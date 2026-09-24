@@ -1,5 +1,8 @@
 import type { ITransportRideType } from "./ITransportRide";
 
+// `deleted` nunca chega ao frontend: uma carona nesse estado sai do mural.
+export type RideStatus = "active" | "canceled";
+
 export interface IRide {
     id: number;
     date: string;
@@ -13,6 +16,7 @@ export interface IRide {
     availableSpots: number;
     obs?: string;
     phone?: string | null;
+    status: RideStatus;
     isOwner: boolean;
     alreadyJoined: boolean;
 }
