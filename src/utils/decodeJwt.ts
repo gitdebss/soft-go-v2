@@ -27,7 +27,11 @@ export function decodeJwt(token: string): DecodedJwt | null {
       base64.length + ((4 - (base64.length % 4)) % 4),
       "=",
     );
-    const decoded = atob(padded);
+    // `atob` devolve um byte por caractere. Um "é" em UTF-8 são dois bytes
+    // (0xC3 0xA9), que lidos assim viram "Ã©" — é preciso decodificar os bytes
+    // como UTF-8 antes do JSON.parse, ou todo nome acentuado sai corrompido.
+    const bytes = Uint8Array.from(atob(padded), (char) => char.charCodeAt(0));
+    const decoded = new TextDecoder().decode(bytes);
     const parsed = JSON.parse(decoded);
 
     return parsed as DecodedJwt;
