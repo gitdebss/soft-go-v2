@@ -27,6 +27,7 @@ const baseRide = {
   occupiedSpots: 1,
   availableSpots: 2,
   phone: "51999999999",
+  status: "active",
   isOwner: false,
   alreadyJoined: false,
 } as IRide;
@@ -144,5 +145,46 @@ describe("Card passenger list", () => {
       expect(screen.getByText("Erro ao carregar passageiras.")).toBeInTheDocument(),
     );
     expect(screen.getByText("Dona da Carona")).toBeInTheDocument();
+  });
+});
+
+describe("Card on a canceled ride", () => {
+  it("says the ride is not happening anymore (CANCEL-16)", () => {
+    renderCard({ status: "canceled" });
+
+    expect(
+      screen.getByText("Essa corrida não vai mais acontecer :("),
+    ).toBeInTheDocument();
+  });
+
+  it("renders the card muted, apart from the active ones (CANCEL-17)", () => {
+    const { container } = renderCard({ status: "canceled" });
+
+    const card = container.querySelector("li");
+
+    expect(card?.className).toContain("bg-surface-tertiary");
+    expect(card?.className).toContain("grayscale");
+    expect(card?.className).not.toContain("bg-surface-primary");
+  });
+
+  it("offers no action to someone who is not the owner (CANCEL-18)", () => {
+    renderCard({ status: "canceled" });
+
+    expect(screen.queryByRole("button", { name: /vou junto/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /whatsapp/i })).not.toBeInTheDocument();
+  });
+
+  // O vínculo das passageiras é preservado no cancelamento justamente para a
+  // dona conseguir avisar cada uma.
+  it("keeps the passenger list reachable by the owner (CANCEL-20)", () => {
+    renderCard({ status: "canceled", isOwner: true });
+
+    expect(screen.getByRole("button", { name: /ver passageiras/i })).toBeInTheDocument();
+  });
+
+  it("keeps showing how many seats were taken (CANCEL-21)", () => {
+    renderCard({ status: "canceled" });
+
+    expect(screen.getByText("1/3 Vagas")).toBeInTheDocument();
   });
 });

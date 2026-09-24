@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp, Clock, MapPin, MessageCircleMore, Users } from "lucide-react";
+import { ChevronDown, ChevronUp, CircleOff, Clock, MapPin, MessageCircleMore, Users } from "lucide-react";
 import { useState } from "react";
 import { getInitials } from "../utils/getInitials";
 import { Button } from "./Button";
@@ -33,6 +33,7 @@ export const Card = (props: ICardProps) => {
 
   const badgeProps = { label: ride.transportType.name, style: ride.transportType.id };
   const confirmationButton = confirmationButtonState(ride);
+  const isCanceled = ride.status === "canceled";
 
   const [showPassengers, setShowPassengers] = useState(false);
   const [passengers, setPassengers] = useState<IUserRide[]>([]);
@@ -63,8 +64,12 @@ export const Card = (props: ICardProps) => {
   };
 
   return (
+    // `grayscale` apaga as cores do badge de transporte e do avatar sem
+    // precisar de uma variante "cancelada" dentro de cada componente filho.
     <li
-      className="flex flex-col shadow-default border border-border-default rounded-xl p-5 bg-surface-primary gap-4"
+      className={`flex flex-col shadow-default border border-border-default rounded-xl p-5 gap-4 ${
+        isCanceled ? "bg-surface-tertiary grayscale" : "bg-surface-primary"
+      }`}
       key={ride.id}
     >
       <div className="flex flex-row justify-between">
@@ -99,9 +104,21 @@ export const Card = (props: ICardProps) => {
           </div>
         </div>
 
+        {/* Sem canal de notificação no app, o card é como quem confirmou
+            presença descobre que a carona caiu. */}
+        {isCanceled && (
+          <div className="flex gap-2 items-center rounded-lg bg-surface-secondary border border-border-default p-3">
+            <CircleOff className="h-4 w-4 shrink-0 text-text-secondary" />
+            <p className="text-sm font-medium text-text-secondary">
+              Essa corrida não vai mais acontecer :(
+            </p>
+          </div>
+        )}
+
         {/* Na própria carona não há ação a oferecer: contatar a si mesma não faz
-            sentido e confirmar presença é recusado pelo backend. */}
-        {!ride.isOwner && (
+            sentido e confirmar presença é recusado pelo backend. Em carona
+            cancelada não há o que confirmar nem o que combinar. */}
+        {!ride.isOwner && !isCanceled && (
           <div className="flex gap-3">
             {ride.phone && (
             <LinkButton
