@@ -4,11 +4,12 @@ import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { Line } from "../components/Line";
 import { RadioVehicle } from "../components/RadioVehicle";
-import { useState } from "react";
 import type { CreateRide } from "../models/dto/CreateRide";
 import { RideService } from "../services/RideService";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { useEffect } from "react";
 import { rideSchema, type RideFormData } from "../schemas/rideSchema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +18,14 @@ import { Textarea } from "../components/Textarea";
 function FormRide() {
   const rideService = new RideService();
   const navigate = useNavigate();
+  const { isAuthenticated, isLoading } = useAuth();
+
+  // Publicar carona exige conta: a dona da carona é a usuária autenticada.
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      navigate("/login");
+    }
+  }, [isLoading, isAuthenticated, navigate]);
 
   const radioVehicleOptions = [
     { label: "Carro", value: 1 },
@@ -39,11 +48,8 @@ function FormRide() {
   });
 
   const handleFormSubmit = (data: RideFormData) => {
-    console.log(data);
-    console.log(typeof data.transportTypeId);
     const rideData: CreateRide = {
       ...data,
-      phone: data.phone?.replace(/\D/g, "") || null,
       complement: data.complement?.trim() || null,
       obs: data.obs?.trim() || null,
       transportTypeId: Number(data.transportTypeId),
@@ -62,6 +68,10 @@ function FormRide() {
   };
 
   const selected = watch("transportTypeId");
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <>
@@ -180,23 +190,6 @@ function FormRide() {
               placeholder="Ex: Vou passar na padaria antes, dividimos pedágio..."
               required={false}
               error={errors.obs?.message}
-            />
-            <Line />
-            <Input
-              {...register("name")}
-              label="Seu nome"
-              type="text"
-              placeholder="Ex: João da Silva"
-              required={true}
-              error={errors.name?.message}
-            />
-            <Input
-              {...register("phone")}
-              label="WhatsApp"
-              type="text"
-              placeholder="(11) 99999-9999"
-              required={false}
-              error={errors.phone?.message}
             />
           </section>
           <Button label="Publicar Viagem" type="submit" style="primary" />
