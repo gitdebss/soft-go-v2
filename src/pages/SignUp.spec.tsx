@@ -43,11 +43,12 @@ describe("SignUp", () => {
     navigateMock.mockReset();
   });
 
-  it("renders all 4 fields with labels", () => {
+  it("renders all 5 fields with labels, including the optional phone (JOIN-12)", () => {
     renderSignUp();
 
     expect(screen.getByLabelText(/^nome/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^e-mail/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/whatsapp/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^senha/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/confirmar senha/i)).toBeInTheDocument();
   });
@@ -135,9 +136,29 @@ describe("SignUp", () => {
         name: "Ana Souza",
         email: "ana@example.com",
         password: "password123",
+        phone: undefined,
       }),
     );
     expect(navigateMock).toHaveBeenCalledWith("/login");
+  });
+
+  it("submits the phone as digits only when it is filled in (JOIN-10)", async () => {
+    signUpMock.mockResolvedValue(undefined);
+    const user = userEvent.setup();
+    renderSignUp();
+
+    await fillValidForm(user);
+    await user.type(screen.getByLabelText(/whatsapp/i), "(51) 99999-9999");
+    await user.click(screen.getByRole("button", { name: /criar conta/i }));
+
+    await waitFor(() =>
+      expect(signUpMock).toHaveBeenCalledWith({
+        name: "Ana Souza",
+        email: "ana@example.com",
+        password: "password123",
+        phone: "51999999999",
+      }),
+    );
   });
 
   it("shows the duplicate-email error returned by the backend", async () => {

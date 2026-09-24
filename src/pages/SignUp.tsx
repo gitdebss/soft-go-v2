@@ -32,10 +32,13 @@ function SignUp() {
 
   const handleFormSubmit = async (data: SignUpFormData) => {
     try {
+      const phoneDigits = data.phone?.replace(/\D/g, "");
+
       await signUp({
         name: data.name,
         email: data.email,
         password: data.password,
+        phone: phoneDigits || undefined,
       });
       toast.success("Conta criada com sucesso! Faça login para continuar.");
       navigate("/login");
@@ -86,6 +89,15 @@ function SignUp() {
             placeholder="Ex: joao@email.com"
             required
             error={errors.email?.message}
+          />
+          <Input
+            {...register("phone")}
+            id="phone"
+            label="WhatsApp (opcional)"
+            type="text"
+            placeholder="Ex: (51) 99999-9999"
+            required={false}
+            error={errors.phone?.message}
           />
           <Input
             {...register("password")}
