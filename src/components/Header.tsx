@@ -1,13 +1,19 @@
 import { CarFront, LogOut } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { Avatar } from "./Avatar";
 import { LinkButton } from "./LinkButton";
 import { getInitials } from "../utils/getInitials";
 
+const NAV_LINKS = [
+  { label: "Início", to: "/" },
+  { label: "Minhas Corridas", to: "/my-rides" },
+];
+
 export const Header = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAuthenticated, user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -32,26 +38,34 @@ export const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-1 flex items-center justify-between w-full p-4 gap-3 bg-surface-primary text-primary-default shadow-default h-15">
-      <div className="flex items-center gap-3">
-        <nav>
-          <ul>
-            <li>
-              <Link to="/">
-              <CarFront className="w-6 h-6" />
-              <h1 className="text-xl font-bold text-text-h">SoftGo</h1>
-              </Link>
-            </li>
-            <li>
-              <Link to='/'>
-              <p>Início</p>
-              </Link>
-            </li>
-            <li>
-              <Link to='/my-rides'>
-              <p>Minhas Corridas</p>
-              </Link>
-            </li>
+    <header className="sticky top-0 z-1 flex items-center justify-between w-full px-4 py-3 gap-4 bg-surface-primary text-primary-default border-b border-border-default h-16">
+      <div className="flex items-center gap-6 min-w-0">
+        <Link to="/" className="flex items-center gap-2 shrink-0">
+          <CarFront className="w-6 h-6" />
+          <h1 className="text-xl font-bold text-text-h hidden sm:block">SoftGo</h1>
+        </Link>
+
+        <nav className="min-w-0">
+          <ul className="flex items-center gap-1">
+            {NAV_LINKS.map((link) => {
+              const isActive = location.pathname === link.to;
+
+              return (
+                <li key={link.to}>
+                  <Link
+                    to={link.to}
+                    aria-current={isActive ? "page" : undefined}
+                    className={`block rounded-full px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors ${
+                      isActive
+                        ? "bg-primary-default/10 text-primary-default"
+                        : "text-text-secondary hover:bg-surface-secondary hover:text-primary-default"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </nav>
       </div>
