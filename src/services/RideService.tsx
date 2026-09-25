@@ -28,6 +28,22 @@ export class RideService {
     return response.data;
   }
 
+  async loadMyRides(date?: string): Promise<IRide[]> {
+    const response = await this.getMyRides(date);
+
+    return response.data;
+  }
+
+  // Sem corte de data: aqui é a listagem própria da dona, guardada por
+  // JwtAuthGuard no backend, não o mural público.
+  async getMyRides(date?: string): Promise<ResponseRideData> {
+    const response = await apiClient.get<ResponseRideData>(`${RIDES_PATH}/mine`, {
+      params: { date },
+    });
+
+    return response.data;
+  }
+
   async getOneRide(id: number): Promise<ResponseRideData> {
     const response = await apiClient.get<ResponseRideData>(
       `${RIDES_PATH}/${id}`,
