@@ -137,6 +137,21 @@ describe("MyRides", () => {
     await waitFor(() => expect(loadMyRidesMock).toHaveBeenCalledWith("2026-03-05"));
   });
 
+  it("clears the date filter and shows every date again when the field is emptied (MYRIDES-13)", async () => {
+    renderMyRides();
+    await screen.findByText("Ativa");
+
+    const filter = screen.getByLabelText(/filtro por data/i);
+    await userEvent.type(filter, "2026-03-05");
+    await waitFor(() => expect(loadMyRidesMock).toHaveBeenCalledWith("2026-03-05"));
+
+    loadMyRidesMock.mockClear();
+    loadMyRidesMock.mockResolvedValue([ativa, inativa, cancelada]);
+    await userEvent.clear(filter);
+
+    await waitFor(() => expect(loadMyRidesMock).toHaveBeenCalledWith(undefined));
+  });
+
   it("does not restrict the date filter to today or later (MYRIDES-12)", () => {
     renderMyRides();
 
