@@ -83,7 +83,7 @@ describe("Card confirmation button", () => {
 
     expect(screen.getByText("Dona da Carona")).toBeInTheDocument();
     expect(screen.getByText(/são leopoldo/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /ver passageiras/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /ver passageiros/i })).toBeInTheDocument();
   });
 
   it('shows "Você já vai nessa carona" disabled once presence is confirmed (JOIN-07)', () => {
@@ -125,7 +125,7 @@ describe("Card passenger list", () => {
   it("hides the trigger on rides the viewer does not own (JOIN-26)", () => {
     renderCard({ isOwner: false });
 
-    expect(screen.queryByRole("button", { name: /ver passageiras/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /ver passageiros/i })).not.toBeInTheDocument();
     expect(getUsersByRideIdMock).not.toHaveBeenCalled();
   });
 
@@ -138,13 +138,13 @@ describe("Card passenger list", () => {
     const user = userEvent.setup();
     renderCard({ isOwner: true });
 
-    await user.click(screen.getByRole("button", { name: /ver passageiras/i }));
+    await user.click(screen.getByRole("button", { name: /ver passageiros/i }));
 
     await waitFor(() => expect(screen.getByText("Ana Souza")).toBeInTheDocument());
     expect(getUsersByRideIdMock).toHaveBeenCalledWith(7);
 
-    await user.click(screen.getByRole("button", { name: /ver passageiras/i }));
-    await user.click(screen.getByRole("button", { name: /ver passageiras/i }));
+    await user.click(screen.getByRole("button", { name: /ver passageiros/i }));
+    await user.click(screen.getByRole("button", { name: /ver passageiros/i }));
 
     expect(getUsersByRideIdMock).toHaveBeenCalledTimes(1);
   });
@@ -154,7 +154,7 @@ describe("Card passenger list", () => {
     const user = userEvent.setup();
     renderCard({ isOwner: true });
 
-    await user.click(screen.getByRole("button", { name: /ver passageiras/i }));
+    await user.click(screen.getByRole("button", { name: /ver passageiros/i }));
 
     await waitFor(() =>
       expect(screen.getByText("Erro ao carregar passageiras.")).toBeInTheDocument(),
@@ -194,7 +194,7 @@ describe("Card on a canceled ride", () => {
   it("keeps the passenger list reachable by the owner (CANCEL-20)", () => {
     renderCard({ status: "canceled", isOwner: true });
 
-    expect(screen.getByRole("button", { name: /ver passageiras/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /ver passageiros/i })).toBeInTheDocument();
   });
 
   it("keeps showing how many seats were taken (CANCEL-21)", () => {
@@ -291,7 +291,7 @@ describe("Card on a ride that already happened (owner view)", () => {
   it("keeps the passenger list reachable on a past ride (MYRIDES-18)", () => {
     renderCard({ isOwner: true, date: "2020-01-01" });
 
-    expect(screen.getByRole("button", { name: /ver passageiras/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /ver passageiros/i })).toBeInTheDocument();
   });
 });
 
@@ -318,7 +318,7 @@ describe("Card layout", () => {
     const user = userEvent.setup();
     renderCard({ isOwner: true });
 
-    await user.click(screen.getByRole("button", { name: /ver passageiras/i }));
+    await user.click(screen.getByRole("button", { name: /ver passageiros/i }));
 
     const emptyState = await screen.findByText(/ninguém confirmou presença ainda/i);
 

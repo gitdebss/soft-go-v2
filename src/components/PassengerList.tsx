@@ -15,23 +15,28 @@ const WHATSAPP_MESSAGE =
 
 export const PassengerList = (props: IPassengerListProps) => {
   if (props.isLoading) {
-    return <p className="text-sm text-text-tertiary">Carregando passageiras...</p>;
+    return (
+      <p className="p-2 text-sm text-text-tertiary">Carregando passageiras...</p>
+    );
   }
 
   if (props.error) {
-    return <p className="text-sm text-error">{props.error}</p>;
+    return <p className="p-2 text-sm text-error">{props.error}</p>;
   }
 
   if (props.passengers.length === 0) {
     return (
-      <p className="text-sm text-text-tertiary">Ninguém confirmou presença ainda</p>
+      <p className="p-2 text-sm text-text-tertiary">Ninguém confirmou presença ainda</p>
     );
   }
 
   return (
-    <ul className="grid gap-3">
+    <ul className="grid divide-y divide-border-default md:divide-y-0">
       {props.passengers.map((passenger) => (
-        <li key={passenger.id} className="flex items-center justify-between gap-3">
+        <li
+          key={passenger.id}
+          className="flex items-center justify-between gap-3 py-3 md:rounded-lg md:px-2 md:py-2 md:hover:bg-surface-secondary"
+        >
           <div className="flex items-center gap-2 min-w-0">
             <Avatar initials={getInitials(passenger.name)} />
             <p className="text-sm truncate">{passenger.name}</p>

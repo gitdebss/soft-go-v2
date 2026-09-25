@@ -19,7 +19,7 @@ export const Button = (props: IButtonProps) => {
     const currentStyle = styleMap[props.style] || styleMap.primary;
     
     return (
-        <button type={props.type} className={`border-0 flex justify-center items-center gap-2 rounded-lg text-base py-2 px-3 h-12 font-medium w-full ${ props.disabled ? styleMap.disabled : currentStyle.styleClass} hover:opacity-80 transition-opacity`} onClick={props.onClick} disabled={props.disabled || props.style === 'disabled'}>
+        <button type={props.type} className={`border-0 flex justify-center items-center gap-2 rounded-lg text-base py-2 px-3 h-12 font-medium w-full ${ props.disabled ? styleMap.disabled : currentStyle.styleClass} hover:opacity-80 transition-opacity cursor-pointer`} onClick={props.onClick} disabled={props.disabled || props.style === 'disabled'}>
             {props.children}
             {props.label}
         </button>

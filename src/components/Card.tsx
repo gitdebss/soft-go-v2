@@ -197,14 +197,20 @@ export const Card = (props: ICardProps) => {
         )}
 
         {ride.isOwner && (
-          <div className="grid gap-3 border-t border-border-default pt-3">
+          <div className="flex flex-col gap-3 md:relative">
+            {/* No mobile o botão é só um link de texto. A partir de `md` ele
+                vira o topo de um dropdown único: quando aberto, perde o
+                arredondamento e a borda inferior para se fundir com a lista
+                logo abaixo, como se fossem uma só caixa. */}
             <button
               type="button"
               aria-expanded={showPassengers}
               onClick={handleTogglePassengers}
-              className="flex items-center justify-between text-sm text-primary-default font-medium"
+              className={`flex items-center justify-between gap-2 text-sm text-primary-default font-medium md:rounded-xl md:border md:border-border-default md:bg-surface-primary md:px-4 md:py-3 md:shadow-default ${
+                showPassengers ? "md:rounded-b-none md:border-b-0" : ""
+              }`}
             >
-              Ver passageiras
+              Ver passageiros
               {showPassengers ? (
                 <ChevronUp className="h-4 w-4" />
               ) : (
@@ -214,9 +220,10 @@ export const Card = (props: ICardProps) => {
 
             {/* No mobile a lista abre dentro do card, que é coluna única. A
                 partir de `md` o mural vira grade, e crescer aqui esticaria a
-                linha inteira: a lista passa a flutuar sob o card. */}
+                linha inteira: a lista passa a flutuar sob o botão, encostada
+                nele para completar o dropdown. */}
             {showPassengers && (
-              <div className="md:absolute md:left-0 md:right-0 md:top-full md:z-20 md:mt-2 md:max-h-72 md:overflow-y-auto md:rounded-xl md:border md:border-border-default md:bg-surface-primary md:p-4 md:shadow-default">
+              <div className="md:absolute md:left-0 md:right-0 md:top-full md:z-20 md:max-h-72 md:overflow-y-auto md:rounded-b-xl md:border md:border-t-0 md:border-border-default md:bg-surface-primary md:p-2 md:shadow-default">
                 <PassengerList
                   passengers={passengers}
                   isLoading={isLoadingPassengers}
