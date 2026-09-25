@@ -14,6 +14,7 @@ import { UserRideService } from "../services/UserRideService";
 import { RideService } from "../services/RideService";
 import { PassengerList } from "./PassengerList";
 import { ConfirmCancelRideModal } from "./ConfirmCancelRideModal";
+import { classifyRide } from "../utils/classifyRide";
 
 interface ICardProps{
   ride: IRide,
@@ -40,6 +41,9 @@ export const Card = (props: ICardProps) => {
   const badgeProps = { label: ride.transportType.name, style: ride.transportType.id };
   const confirmationButton = confirmationButtonState(ride);
   const isCanceled = ride.status === "canceled";
+  // Cancelar uma carona que já aconteceu não tem efeito útil; a Home nunca
+  // mostra corrida passada, então isPast só entra em jogo em "Minhas Corridas".
+  const isPast = classifyRide(ride, format(new Date(), "yyyy-MM-dd")) === "inativa";
 
   const [showPassengers, setShowPassengers] = useState(false);
   const [passengers, setPassengers] = useState<IUserRide[]>([]);
@@ -116,8 +120,9 @@ export const Card = (props: ICardProps) => {
           <Badge {...badgeProps}></Badge>
 
           {/* Estado terminal: uma carona já cancelada não oferece a ação de
-              novo, e o backend responderia 409. */}
-          {ride.isOwner && !isCanceled && (
+              novo, e o backend responderia 409. Uma corrida que já aconteceu
+              também não oferece: cancelar o que já rolou não faz sentido. */}
+          {ride.isOwner && !isCanceled && !isPast && (
             <button
               type="button"
               aria-label="Cancelar carona"

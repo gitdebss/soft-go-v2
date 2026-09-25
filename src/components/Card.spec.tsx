@@ -271,6 +271,30 @@ describe("Card cancel action", () => {
   });
 });
 
+describe("Card on a ride that already happened (owner view)", () => {
+  it("hides the cancel action on a past active ride (MYRIDES-16)", () => {
+    renderCard({ isOwner: true, date: "2020-01-01" });
+
+    expect(
+      screen.queryByRole("button", { name: /cancelar carona/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("still offers the cancel action on a ride yet to happen (MYRIDES-15)", () => {
+    renderCard({ isOwner: true, date: "2099-01-01" });
+
+    expect(
+      screen.getByRole("button", { name: /cancelar carona/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("keeps the passenger list reachable on a past ride (MYRIDES-18)", () => {
+    renderCard({ isOwner: true, date: "2020-01-01" });
+
+    expect(screen.getByRole("button", { name: /ver passageiras/i })).toBeInTheDocument();
+  });
+});
+
 describe("Card layout", () => {
   it("puts the cancel control beside the transport badge, icon only (CANCEL-02)", () => {
     renderCard({ isOwner: true });
