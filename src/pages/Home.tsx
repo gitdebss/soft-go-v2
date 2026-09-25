@@ -128,7 +128,7 @@ function Home() {
           ))}
         </ul>
 
-        {rides.length === 0 ? (
+        {rides?.length === 0 ? (
           <div className="flex flex-col w-full justify-center h-full items-center pt-7 gap-4">
             <Road className="h-15 w-15 text-text-secondary" />
             <p className="font-semibold text-xl text-text-secondary">
@@ -137,7 +137,7 @@ function Home() {
           </div>
         ) : (
           <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-            {rides.map((ride) => (
+            {rides?.map((ride) => (
               <Card
                 ride={ride}
                 key={ride.id}
