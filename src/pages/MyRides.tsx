@@ -68,6 +68,14 @@ function MyRides() {
     <>
       <Header />
       <main className="p-4 gap-4 grid">
+        <section className="rounded-xl bg-surface-tertiary p-5 flex flex-col gap-1">
+          <h2 className="text-2xl font-bold text-text-primary">Minhas Corridas</h2>
+          <p className="text-sm text-text-secondary">
+            Acompanhe as corridas que você publicou: o que ainda vai rolar, o
+            que já aconteceu e o que foi cancelado.
+          </p>
+        </section>
+
         <LinkButton
           label="Vou pra Soft"
           style="primary"
