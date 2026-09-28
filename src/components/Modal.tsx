@@ -94,8 +94,10 @@ export const Modal = (props: IModalProps) => {
         </div>
 
         {props.ride.obs && (
-          <div className="rounded-xl bg-primary-default/10 p-3">
-            <p className="text-sm text-primary-default italic">"{props.ride.obs}"</p>
+          <div className="h-12 flex items-center rounded-lg bg-surface-tertiary border-l-4 border-primary-default px-3 max-w-full">
+            <p className="text-sm text-text-secondary italic truncate">
+              "{props.ride.obs}"
+            </p>
           </div>
         )}
 

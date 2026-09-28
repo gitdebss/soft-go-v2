@@ -1,9 +1,8 @@
-import { Home, Plus, Road } from "lucide-react";
+import { Home, Road } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 const MOBILE_NAV_LINKS = [
   { label: "Início", to: "/", icon: Home },
-  { label: "Nova Carona", to: "/form-ride", icon: Plus },
   { label: "Minhas Corridas", to: "/my-rides", icon: Road },
 ];
 
