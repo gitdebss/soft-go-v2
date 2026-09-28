@@ -2,11 +2,13 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const postMock = vi.fn();
 const getMock = vi.fn();
+const deleteMock = vi.fn();
 
 vi.mock("../lib/apiClient", () => ({
   apiClient: {
     post: (...args: unknown[]) => postMock(...args),
     get: (...args: unknown[]) => getMock(...args),
+    delete: (...args: unknown[]) => deleteMock(...args),
   },
 }));
 
@@ -18,6 +20,7 @@ describe("UserRideService", () => {
   beforeEach(() => {
     postMock.mockReset();
     getMock.mockReset();
+    deleteMock.mockReset();
   });
 
   it("confirms presence with a POST carrying no body (JOIN-02)", async () => {
@@ -40,6 +43,18 @@ describe("UserRideService", () => {
 
     expect(getMock).toHaveBeenCalledWith("/user-ride/42");
     expect(result.data).toEqual([]);
+  });
+
+  it("cancels the presence with a DELETE carrying no body (LEAVE-03)", async () => {
+    deleteMock.mockResolvedValue({
+      data: { statusCode: 200, message: "Success", data: { id: 42 } },
+    });
+
+    const result = await userRideService.cancelUserRide(42);
+
+    expect(deleteMock).toHaveBeenCalledWith("/user-ride/42");
+    expect(deleteMock.mock.calls[0]).toHaveLength(1);
+    expect(result.data).toEqual({ id: 42 });
   });
 
   it("no longer offers a global passenger listing (JOIN-24)", () => {
