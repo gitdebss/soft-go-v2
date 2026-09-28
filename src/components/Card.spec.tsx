@@ -200,6 +200,16 @@ describe("Card on a canceled ride", () => {
     expect(screen.queryByRole("link", { name: /whatsapp/i })).not.toBeInTheDocument();
   });
 
+  // A qualificação "carona ativa" de LEAVE-01: mesmo com presença confirmada,
+  // uma carona cancelada não oferece "Cancelar presença".
+  it('omits "Cancelar presença" once the ride itself gets canceled (LEAVE-01)', () => {
+    renderCard({ status: "canceled", alreadyJoined: true });
+
+    expect(
+      screen.queryByRole("button", { name: /cancelar presença/i }),
+    ).not.toBeInTheDocument();
+  });
+
   // O vínculo das passageiras é preservado no cancelamento justamente para a
   // dona conseguir avisar cada uma.
   it("keeps the passenger list reachable by the owner (CANCEL-20)", () => {
@@ -297,7 +307,7 @@ describe("Card cancel presence action", () => {
     expect(cancelUserRideMock).not.toHaveBeenCalled();
   });
 
-  it("cancels the presence and reloads the board once confirmed (LEAVE-04)", async () => {
+  it("cancels the presence and reloads the board once confirmed (LEAVE-03)", async () => {
     cancelUserRideMock.mockResolvedValue({
       statusCode: 200,
       message: "Success",
