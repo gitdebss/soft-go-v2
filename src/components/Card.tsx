@@ -14,6 +14,7 @@ import { UserRideService } from "../services/UserRideService";
 import { RideService } from "../services/RideService";
 import { PassengerList } from "./PassengerList";
 import { ConfirmCancelRideModal } from "./ConfirmCancelRideModal";
+import { ConfirmCancelPresenceModal } from "./ConfirmCancelPresenceModal";
 import { classifyRide } from "../utils/classifyRide";
 
 interface ICardProps{
@@ -25,8 +26,10 @@ interface ICardProps{
 // O backend já informa a relação da usuária logada com a carona, então o card
 // mostra o estado antes do clique em vez de só errar depois dele.
 // A dona não chega aqui: o bloco de ações inteiro não é renderizado para ela.
+// Com presença já confirmada, o mesmo botão vira o gatilho para cancelá-la
+// (reaproveitado, sem elemento novo no card).
 function confirmationButtonState(ride: IRide): { label: string; disabled: boolean } {
-  if (ride.alreadyJoined) return { label: "Você já vai nessa carona", disabled: true };
+  if (ride.alreadyJoined) return { label: "Cancelar presença", disabled: false };
   // `availableSpots` nulo é capacidade ilimitada (ônibus): nunca lota.
   if (ride.availableSpots === 0) return { label: "Vou junto", disabled: true };
 
@@ -53,6 +56,8 @@ export const Card = (props: ICardProps) => {
   const [hasFetchedPassengers, setHasFetchedPassengers] = useState(false);
   const [isConfirmingCancel, setIsConfirmingCancel] = useState(false);
   const [isCanceling, setIsCanceling] = useState(false);
+  const [isConfirmingCancelPresence, setIsConfirmingCancelPresence] = useState(false);
+  const [isCancelingPresence, setIsCancelingPresence] = useState(false);
 
   // O backend decide o desfecho pela contagem de passageiras, então o retorno
   // para a dona muda conforme ele: uma carona que continua no mural pede que
@@ -78,6 +83,37 @@ export const Card = (props: ICardProps) => {
       toast.error(message);
     } finally {
       setIsCanceling(false);
+    }
+  };
+
+  // Presença já confirmada: o clique no botão reaproveitado abre a
+  // confirmação em vez de chamar o endpoint direto.
+  const handleConfirmationClick = () => {
+    if (ride.alreadyJoined) {
+      setIsConfirmingCancelPresence(true);
+      return;
+    }
+
+    props.onOpenModal(ride);
+  };
+
+  const handleCancelPresence = async () => {
+    setIsCancelingPresence(true);
+
+    try {
+      await userRideService.cancelUserRide(ride.id);
+
+      toast.success("Presença cancelada. Sua vaga foi liberada.");
+      setIsConfirmingCancelPresence(false);
+      props.onCanceled();
+    } catch (error) {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.message ?? "Erro ao cancelar presença.")
+        : "Erro ao cancelar presença.";
+
+      toast.error(message);
+    } finally {
+      setIsCancelingPresence(false);
     }
   };
 
@@ -201,7 +237,7 @@ export const Card = (props: ICardProps) => {
               label={confirmationButton.label}
               type="button"
               style="primary"
-              onClick={() => props.onOpenModal(ride)}
+              onClick={handleConfirmationClick}
               disabled={confirmationButton.disabled}
             ></Button>
           </div>
@@ -254,6 +290,16 @@ export const Card = (props: ICardProps) => {
           isSubmitting={isCanceling}
           onClose={() => setIsConfirmingCancel(false)}
           onConfirm={handleCancelRide}
+        />
+      )}
+
+      {isConfirmingCancelPresence && (
+        <ConfirmCancelPresenceModal
+          ride={ride}
+          open={isConfirmingCancelPresence}
+          isSubmitting={isCancelingPresence}
+          onClose={() => setIsConfirmingCancelPresence(false)}
+          onConfirm={handleCancelPresence}
         />
       )}
     </li>

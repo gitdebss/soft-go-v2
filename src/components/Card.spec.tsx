@@ -4,14 +4,16 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import type { IRide } from "../models/IRide";
 
-const { getUsersByRideIdMock, cancelRideMock } = vi.hoisted(() => ({
+const { getUsersByRideIdMock, cancelRideMock, cancelUserRideMock } = vi.hoisted(() => ({
   getUsersByRideIdMock: vi.fn(),
   cancelRideMock: vi.fn(),
+  cancelUserRideMock: vi.fn(),
 }));
 
 vi.mock("../services/UserRideService", () => ({
   UserRideService: class {
     getUsersByRideId = getUsersByRideIdMock;
+    cancelUserRide = cancelUserRideMock;
   },
 }));
 
@@ -59,6 +61,7 @@ function renderCard(overrides: Partial<IRide> = {}, onCanceled = vi.fn()) {
 beforeEach(() => {
   getUsersByRideIdMock.mockReset();
   cancelRideMock.mockReset();
+  cancelUserRideMock.mockReset();
 });
 
 describe("Card confirmation button", () => {
@@ -86,11 +89,19 @@ describe("Card confirmation button", () => {
     expect(screen.getByRole("button", { name: /ver passageiros/i })).toBeInTheDocument();
   });
 
-  it('shows "Você já vai nessa carona" disabled once presence is confirmed (JOIN-07)', () => {
+  it('offers "Cancelar presença" enabled once presence is confirmed (LEAVE-01)', () => {
     renderCard({ alreadyJoined: true });
 
-    const button = screen.getByRole("button", { name: /você já vai nessa carona/i });
-    expect(button).toBeDisabled();
+    const button = screen.getByRole("button", { name: /cancelar presença/i });
+    expect(button).toBeEnabled();
+  });
+
+  it('offers no "Cancelar presença" action before presence is confirmed (LEAVE-10)', () => {
+    renderCard();
+
+    expect(
+      screen.queryByRole("button", { name: /cancelar presença/i }),
+    ).not.toBeInTheDocument();
   });
 
   it("disables the button when the ride has no seats left (JOIN-29)", () => {
@@ -267,6 +278,50 @@ describe("Card cancel action", () => {
     await user.click(screen.getByRole("button", { name: /sim, cancelar carona/i }));
 
     await waitFor(() => expect(cancelRideMock).toHaveBeenCalledTimes(1));
+    expect(onCanceled).not.toHaveBeenCalled();
+  });
+});
+
+describe("Card cancel presence action", () => {
+  // Cancelar não tem volta na mesma sessão: o clique abre a confirmação, não
+  // o endpoint (mesmo padrão de CANCEL-03, do lado da dona).
+  it("asks before canceling the presence (LEAVE-02)", async () => {
+    const user = userEvent.setup();
+    renderCard({ alreadyJoined: true });
+
+    await user.click(screen.getByRole("button", { name: /cancelar presença/i }));
+
+    expect(
+      screen.getByRole("heading", { name: /cancelar presença/i }),
+    ).toBeInTheDocument();
+    expect(cancelUserRideMock).not.toHaveBeenCalled();
+  });
+
+  it("cancels the presence and reloads the board once confirmed (LEAVE-04)", async () => {
+    cancelUserRideMock.mockResolvedValue({
+      statusCode: 200,
+      message: "Success",
+      data: { id: 7 },
+    });
+    const user = userEvent.setup();
+    const { onCanceled } = renderCard({ alreadyJoined: true });
+
+    await user.click(screen.getByRole("button", { name: /cancelar presença/i }));
+    await user.click(screen.getByRole("button", { name: /sim, cancelar presença/i }));
+
+    await waitFor(() => expect(cancelUserRideMock).toHaveBeenCalledWith(7));
+    await waitFor(() => expect(onCanceled).toHaveBeenCalledTimes(1));
+  });
+
+  it("keeps the board untouched when the cancel request fails", async () => {
+    cancelUserRideMock.mockRejectedValue(new Error("network"));
+    const user = userEvent.setup();
+    const { onCanceled } = renderCard({ alreadyJoined: true });
+
+    await user.click(screen.getByRole("button", { name: /cancelar presença/i }));
+    await user.click(screen.getByRole("button", { name: /sim, cancelar presença/i }));
+
+    await waitFor(() => expect(cancelUserRideMock).toHaveBeenCalledTimes(1));
     expect(onCanceled).not.toHaveBeenCalled();
   });
 });
