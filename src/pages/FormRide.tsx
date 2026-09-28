@@ -14,6 +14,7 @@ import { rideSchema, type RideFormData } from "../schemas/rideSchema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Textarea } from "../components/Textarea";
+import { BUS_TRANSPORT_TYPE_ID } from "../models/ITransportRide";
 
 function FormRide() {
   const rideService = new RideService();
@@ -53,7 +54,7 @@ function FormRide() {
       complement: data.complement?.trim() || null,
       obs: data.obs?.trim() || null,
       transportTypeId: Number(data.transportTypeId),
-      totalSpots: Number(data.totalSpots),
+      totalSpots: data.totalSpots !== undefined ? Number(data.totalSpots) : null,
     };
 
     rideService
@@ -68,6 +69,15 @@ function FormRide() {
   };
 
   const selected = watch("transportTypeId");
+  const isBus = selected === BUS_TRANSPORT_TYPE_ID;
+
+  // Ônibus não tem vaga limitada: some o campo e descarta valor de um tipo
+  // selecionado antes, para não sobreviver escondido até o submit.
+  useEffect(() => {
+    if (isBus) {
+      setValue("totalSpots", undefined, { shouldValidate: true });
+    }
+  }, [isBus, setValue]);
 
   if (!isAuthenticated) {
     return null;
@@ -76,7 +86,7 @@ function FormRide() {
   return (
     <>
       <Header />
-      <main className="p-4 gap-4 grid justify-self-center w-full max-w-2xl">
+      <main className="p-4 pb-24 sm:pb-4 gap-4 grid justify-self-center w-full max-w-2xl">
         <div className="gap-1 grid mt-1 mb-1">
           <h2 className="text-text-primary font-medium">Publicar no mural</h2>
 
@@ -167,16 +177,18 @@ function FormRide() {
                 {errors.transportTypeId?.message}
               </p>
             )}
-            <Input
-              {...register("totalSpots", {
-                valueAsNumber: true,
-              })}
-              label="Número de vagas"
-              type="number"
-              placeholder="Ex: 4"
-              required={true}
-              error={errors.totalSpots?.message}
-            />
+            {!isBus && (
+              <Input
+                {...register("totalSpots", {
+                  valueAsNumber: true,
+                })}
+                label="Número de vagas"
+                type="number"
+                placeholder="Ex: 4"
+                required={true}
+                error={errors.totalSpots?.message}
+              />
+            )}
           </section>
           <section className="gap-4 grid">
             <div className="flex items-center text-text-secondary text-xl font-bold gap-2">

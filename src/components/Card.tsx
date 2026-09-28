@@ -27,6 +27,7 @@ interface ICardProps{
 // A dona não chega aqui: o bloco de ações inteiro não é renderizado para ela.
 function confirmationButtonState(ride: IRide): { label: string; disabled: boolean } {
   if (ride.alreadyJoined) return { label: "Você já vai nessa carona", disabled: true };
+  // `availableSpots` nulo é capacidade ilimitada (ônibus): nunca lota.
   if (ride.availableSpots === 0) return { label: "Vou junto", disabled: true };
 
   return { label: "Vou junto", disabled: false };
@@ -155,10 +156,20 @@ export const Card = (props: ICardProps) => {
           <div className="flex gap-2">
             <Users className="h-4 w-4 inline" />
             <p>
-              {ride.occupiedSpots}/{ride.totalSpots} Vagas
+              {ride.totalSpots === null
+                ? `${ride.occupiedSpots} confirmadas`
+                : `${ride.occupiedSpots}/${ride.totalSpots} Vagas`}
             </p>
           </div>
         </div>
+
+        {ride.obs && (
+          <div className="rounded-lg bg-primary-default/10 px-3 py-2 max-w-full">
+            <p className="text-sm text-primary-default italic truncate">
+              "{ride.obs}"
+            </p>
+          </div>
+        )}
 
         {/* Sem canal de notificação no app, o card é como quem confirmou
             presença descobre que a carona caiu. */}

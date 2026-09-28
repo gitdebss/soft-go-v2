@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { Avatar } from "./Avatar";
 import { LinkButton } from "./LinkButton";
+import { MobileNav } from "./MobileNav";
 import { getInitials } from "../utils/getInitials";
 
 const NAV_LINKS = [
@@ -38,14 +39,15 @@ export const Header = () => {
   };
 
   return (
+    <>
     <header className="sticky top-0 z-1 flex items-center justify-between w-full px-4 py-3 gap-4 bg-surface-primary text-primary-default border-b border-border-default h-16">
       <div className="flex items-center gap-6 min-w-0">
         <Link to="/" className="flex items-center gap-2 shrink-0">
           <CarFront className="w-6 h-6" />
-          <h1 className="text-xl font-bold text-text-h hidden sm:block">SoftGo</h1>
+          <h1 className="text-xl font-bold text-text-h">SoftGo</h1>
         </Link>
 
-        <nav className="min-w-0">
+        <nav className="hidden sm:block min-w-0">
           <ul className="flex items-center gap-1">
             {NAV_LINKS.map((link) => {
               const isActive = location.pathname === link.to;
@@ -111,5 +113,7 @@ export const Header = () => {
         </div>
       )}
     </header>
+    <MobileNav />
+    </>
   );
 };

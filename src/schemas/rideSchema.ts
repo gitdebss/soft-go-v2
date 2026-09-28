@@ -1,6 +1,7 @@
 import { z } from "zod";
+import { BUS_TRANSPORT_TYPE_ID } from "../models/ITransportRide";
 
-export const rideSchema = z.object({
+const rideObjectSchema = z.object({
   date: z
     .string()
     .min(1, "A data é obrigatória")
@@ -28,11 +29,21 @@ export const rideSchema = z.object({
     .number()
     .min(1, "Selecione um tipo de transporte"),
 
-  totalSpots: z
-    .number()
-    .min(1, "Deve haver pelo menos 1 vaga"),
+  // Opcional no schema: obrigatório só é decidido no refine abaixo, porque
+  // ônibus não tem vaga limitada e não exibe o campo.
+  totalSpots: z.number().optional(),
 
   obs: z.string().optional(),
 });
 
-export type RideFormData = z.infer<typeof rideSchema>;
+export const rideSchema = rideObjectSchema.refine(
+  (data) =>
+    data.transportTypeId === BUS_TRANSPORT_TYPE_ID ||
+    (data.totalSpots !== undefined && data.totalSpots >= 1),
+  {
+    message: "Deve haver pelo menos 1 vaga",
+    path: ["totalSpots"],
+  },
+);
+
+export type RideFormData = z.infer<typeof rideObjectSchema>;

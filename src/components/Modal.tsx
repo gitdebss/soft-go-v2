@@ -84,11 +84,20 @@ export const Modal = (props: IModalProps) => {
             <p>
               Saindo de {props.ride.city}
               <b className="text-primary-default font-light">
-                • {props.ride.occupiedSpots}/{props.ride.totalSpots} Vagas{" "}
+                •{" "}
+                {props.ride.totalSpots === null
+                  ? `${props.ride.occupiedSpots} confirmadas`
+                  : `${props.ride.occupiedSpots}/${props.ride.totalSpots} Vagas`}{" "}
               </b>
             </p>
           </div>
         </div>
+
+        {props.ride.obs && (
+          <div className="rounded-xl bg-primary-default/10 p-3">
+            <p className="text-sm text-primary-default italic">"{props.ride.obs}"</p>
+          </div>
+        )}
 
         <div className="grid gap-1 bg-surface-secondary border-2 border-border-default rounded-xl p-3">
           <p className="text-text-tertiary text-sm">Você vai como</p>

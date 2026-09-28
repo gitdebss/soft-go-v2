@@ -88,6 +88,20 @@ describe("Modal", () => {
     expect(screen.getByText("Telefone não informado")).toBeInTheDocument();
   });
 
+  it("shows the ride observation when there is one", () => {
+    renderModal({ ride: { ...ride, obs: "Divido o Uber em 3, racho pelo Pix" } });
+
+    expect(
+      screen.getByText('"Divido o Uber em 3, racho pelo Pix"'),
+    ).toBeInTheDocument();
+  });
+
+  it("omits the observation block when the ride has none", () => {
+    renderModal();
+
+    expect(screen.queryByText(/^"/)).not.toBeInTheDocument();
+  });
+
   it("confirms presence with the ride id only, then closes and reloads (JOIN-02, JOIN-09)", async () => {
     createUserRideMock.mockResolvedValue({ statusCode: 201, message: "Success", data: {} });
     const user = userEvent.setup();

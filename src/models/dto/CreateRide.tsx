@@ -4,6 +4,6 @@ export interface CreateRide {
     city: string;
     complement?: string | null;
     transportTypeId: number;
-    totalSpots: number;
+    totalSpots: number | null;
     obs?: string | null;
 }

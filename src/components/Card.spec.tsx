@@ -295,6 +295,30 @@ describe("Card on a ride that already happened (owner view)", () => {
   });
 });
 
+describe("Card observation", () => {
+  it("shows the observation quoted above the confirmation button", () => {
+    renderCard({ obs: "Divido o Uber em 3, racho pelo Pix" });
+
+    expect(
+      screen.getByText('"Divido o Uber em 3, racho pelo Pix"'),
+    ).toBeInTheDocument();
+  });
+
+  it("omits the observation block when the ride has none", () => {
+    renderCard({ obs: undefined });
+
+    expect(screen.queryByText(/^"/)).not.toBeInTheDocument();
+  });
+
+  it("clips a long observation to a single line with an ellipsis via CSS", () => {
+    const longObs = "a".repeat(200);
+    renderCard({ obs: longObs });
+
+    const shown = screen.getByText(`"${longObs}"`);
+    expect(shown.className).toContain("truncate");
+  });
+});
+
 describe("Card layout", () => {
   it("puts the cancel control beside the transport badge, icon only (CANCEL-02)", () => {
     renderCard({ isOwner: true });

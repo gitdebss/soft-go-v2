@@ -67,7 +67,7 @@ function MyRides() {
   return (
     <>
       <Header />
-      <main className="p-4 gap-4 grid">
+      <main className="p-4 pb-24 sm:pb-4 gap-4 grid">
         <section className="rounded-xl bg-surface-primary p-5 flex flex-col gap-1">
           <h2 className="text-2xl font-bold text-text-primary">Minhas Corridas</h2>
           <p className="text-sm text-text-secondary">

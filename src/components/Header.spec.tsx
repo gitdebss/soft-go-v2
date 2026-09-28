@@ -131,11 +131,13 @@ describe("Header navigation", () => {
 
   // Um link relativo resolveria contra a rota atual: partindo de /form-ride,
   // "my-rides" viraria "/form-ride/my-rides" em vez da tela certa.
+  // Existem dois: o pill do header (desktop) e o atalho da navbar mobile.
   it('points "Minhas Corridas" at the absolute path, not a relative one', () => {
     renderHeader();
 
-    const link = screen.getByRole("link", { name: /minhas corridas/i });
+    const links = screen.getAllByRole("link", { name: /minhas corridas/i });
 
-    expect(link).toHaveAttribute("href", "/my-rides");
+    expect(links).toHaveLength(2);
+    links.forEach((link) => expect(link).toHaveAttribute("href", "/my-rides"));
   });
 });

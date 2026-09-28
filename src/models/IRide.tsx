@@ -11,9 +11,9 @@ export interface IRide {
     name: string;
     transportType: ITransportRideType;
     complement?: string;
-    totalSpots: number;
+    totalSpots: number | null;
     occupiedSpots: number;
-    availableSpots: number;
+    availableSpots: number | null;
     obs?: string;
     phone?: string | null;
     status: RideStatus;

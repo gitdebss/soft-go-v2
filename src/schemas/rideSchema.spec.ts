@@ -44,6 +44,22 @@ describe("rideSchema", () => {
     expect(result.success).toBe(false);
   });
 
+  it("rejects a non-bus ride with no seats given at all", () => {
+    const result = rideSchema.safeParse(
+      validData({ transportTypeId: 1, totalSpots: undefined }),
+    );
+
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts a bus ride with no seats given, since it has no seat limit", () => {
+    const result = rideSchema.safeParse(
+      validData({ transportTypeId: 3, totalSpots: undefined }),
+    );
+
+    expect(result.success).toBe(true);
+  });
+
   it("still rejects a date in the past", () => {
     const result = rideSchema.safeParse(validData({ date: "2020-01-01" }));
 

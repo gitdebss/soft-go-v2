@@ -67,7 +67,7 @@ function Home() {
   return (
     <>
       <Header />
-      <main className="p-4 gap-4 grid">
+      <main className="p-4 pb-24 sm:pb-4 gap-4 grid">
         <LinkButton
           label="Vou pra Soft"
           style="primary"
