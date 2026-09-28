@@ -1,7 +1,7 @@
 interface IButtonProps{
     label: string,
     type: 'submit' | 'reset' | 'button',
-    style: 'primary' | 'secondary' | 'tertiary' | 'disabled',
+    style: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'disabled',
     disabled?: boolean,
     children?: React.ReactNode,
     onClick?:  () => void
@@ -11,6 +11,7 @@ const styleMap: Record<string, { styleClass: string }> = {
         primary: { styleClass: 'bg-primary-default text-on-primary' },
         secondary: { styleClass: 'bg-surface-primary text-primary-default' },
         tertiary: { styleClass: 'bg-surface-tertiary text-text-primary' },
+        danger: { styleClass: 'bg-danger-default text-on-danger' },
         disabled: { styleClass: 'bg-surface-tertiary text-text-disable cursor-not-allowed' },
     };
 

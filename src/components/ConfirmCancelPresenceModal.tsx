@@ -60,7 +60,7 @@ export const ConfirmCancelPresenceModal = (props: IConfirmCancelPresenceModalPro
         <Button
           type="button"
           label="Sim, cancelar presença"
-          style="primary"
+          style="danger"
           disabled={props.isSubmitting}
           onClick={props.onConfirm}
         >

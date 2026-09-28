@@ -9,10 +9,12 @@
   --color-suport-2: #E0F480;
   --color-suport-3: #ED7848;
   --color-success: #25D366;
+  --color-danger-default: #DC2626;
 
   --color-on-suport-1: #481566;
   --color-on-suport-2: #4A5612;
   --color-on-suport-3: #FFFFFF;
+  --color-on-danger: #FFFFFF;
 
   --color-text-primary: #202020;
   --color-text-secondary: #454647;

@@ -62,7 +62,7 @@ export const ConfirmCancelRideModal = (props: IConfirmCancelRideModalProps) => {
         <Button
           type="button"
           label="Sim, cancelar carona"
-          style="primary"
+          style="danger"
           disabled={props.isSubmitting}
           onClick={props.onConfirm}
         >

@@ -27,13 +27,16 @@ interface ICardProps{
 // mostra o estado antes do clique em vez de só errar depois dele.
 // A dona não chega aqui: o bloco de ações inteiro não é renderizado para ela.
 // Com presença já confirmada, o mesmo botão vira o gatilho para cancelá-la
-// (reaproveitado, sem elemento novo no card).
-function confirmationButtonState(ride: IRide): { label: string; disabled: boolean } {
-  if (ride.alreadyJoined) return { label: "Cancelar presença", disabled: false };
+// (reaproveitado, sem elemento novo no card). O estilo muda junto: "tertiary"
+// para não competir visualmente com o "primary" de quem ainda vai confirmar.
+function confirmationButtonState(
+  ride: IRide,
+): { label: string; disabled: boolean; style: "primary" | "tertiary" } {
+  if (ride.alreadyJoined) return { label: "Cancelar presença", disabled: false, style: "tertiary" };
   // `availableSpots` nulo é capacidade ilimitada (ônibus): nunca lota.
-  if (ride.availableSpots === 0) return { label: "Vou junto", disabled: true };
+  if (ride.availableSpots === 0) return { label: "Vou junto", disabled: true, style: "primary" };
 
-  return { label: "Vou junto", disabled: false };
+  return { label: "Vou junto", disabled: false, style: "primary" };
 }
 
 const userRideService = new UserRideService();
@@ -165,7 +168,7 @@ export const Card = (props: ICardProps) => {
               aria-label="Cancelar carona"
               title="Cancelar carona"
               onClick={() => setIsConfirmingCancel(true)}
-              className="h-8 w-8 shrink-0 rounded-full border-0 flex items-center justify-center bg-surface-tertiary text-text-secondary hover:bg-surface-secondary hover:text-red-700 transition-colors cursor-pointer"
+              className="h-8 w-8 shrink-0 rounded-full border-0 flex items-center justify-center bg-danger-default/10 text-danger-default hover:bg-danger-default/20 transition-colors cursor-pointer"
             >
               <Trash2 className="h-4 w-4" />
             </button>
@@ -200,8 +203,8 @@ export const Card = (props: ICardProps) => {
         </div>
 
         {ride.obs && (
-          <div className="rounded-lg bg-primary-default/10 px-3 py-2 max-w-full">
-            <p className="text-sm text-primary-default italic truncate">
+          <div className="h-12 flex items-center rounded-lg bg-surface-tertiary border-l-4 border-primary-default px-3 max-w-full">
+            <p className="text-sm text-text-secondary italic truncate">
               "{ride.obs}"
             </p>
           </div>
@@ -236,7 +239,7 @@ export const Card = (props: ICardProps) => {
             <Button
               label={confirmationButton.label}
               type="button"
-              style="primary"
+              style={confirmationButton.style}
               onClick={handleConfirmationClick}
               disabled={confirmationButton.disabled}
             ></Button>
