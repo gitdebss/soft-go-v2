@@ -7,6 +7,8 @@ import { useAuth } from "../contexts/AuthContext";
 import { Button } from "./Button";
 import { Line } from "./Line";
 import { UserRideService } from "../services/UserRideService";
+import { formatOccupancyVisible, formatOccupancySpoken } from "../utils/formatOccupancy";
+import { useFocusTrap } from "../utils/useFocusTrap";
 
 interface IModalProps {
   ride: IRide;
@@ -31,6 +33,7 @@ function formatPhone(phone?: string | null): string | null {
 
 export const Modal = (props: IModalProps) => {
   const { user } = useAuth();
+  const contentRef = useFocusTrap(props.open, props.onClose);
 
   const handleConfirm = async () => {
     try {
@@ -49,22 +52,26 @@ export const Modal = (props: IModalProps) => {
 
   const formattedPhone = formatPhone(user?.phone);
 
+  if (!props.open) return null;
+
   return (
     <dialog
-      className={
-        props.open
-          ? `fixed top-0 bottom-0 h-full w-full flex items-center justify-center backdrop-blur bg-black/40 z-30`
-          : `sr-only`
-      }
+      className="fixed top-0 bottom-0 h-full w-full flex items-center justify-center backdrop-blur bg-black/40 z-30"
       open
     >
-      <div className="bg-surface-primary p-6 z-50 grid gap-5 rounded-2xl m-4">
+      <div
+        ref={contentRef}
+        aria-modal="true"
+        aria-labelledby="modal-join-title"
+        className="bg-surface-primary p-6 z-50 grid gap-5 rounded-2xl m-4"
+      >
         <div className="grid gap-2">
           <div className="flex justify-between">
-            <h2 className="font-bold text-xl">Quero ir junto!</h2>
+            <h2 id="modal-join-title" className="font-bold text-xl">Quero ir junto!</h2>
             <button
               className="border-none w-fit h-fit flex items-center bg-none"
               type="button"
+              aria-label="Fechar"
               onClick={props.onClose}
             >
               <X />
@@ -74,20 +81,21 @@ export const Modal = (props: IModalProps) => {
         </div>
         <Line />
         <div className="flex row items-center gap-3 bg-surface-secondary border-2 border-border-default rounded-xl p-3">
-          <span className="rounded-full w-8 h-8 flex items-center justify-center bg-primary-default text-on-primary">
+          <span
+            aria-hidden="true"
+            className="rounded-full w-8 h-8 flex items-center justify-center bg-primary-default text-on-primary"
+          >
             {getInitials(props.ride.name)}
           </span>
           <div className="grid">
             <p>
-              <b>{props.ride.name}</b> • {props.ride.hour}
+              <b>{props.ride.name}</b> <span aria-hidden="true">•</span> {props.ride.hour}
             </p>
             <p>
               Saindo de {props.ride.city}
               <b className="text-primary-default font-light">
-                •{" "}
-                {props.ride.totalSpots === null
-                  ? `${props.ride.occupiedSpots} confirmadas`
-                  : `${props.ride.occupiedSpots}/${props.ride.totalSpots} Vagas`}{" "}
+                <span aria-hidden="true">• {formatOccupancyVisible(props.ride)}</span>
+                <span className="sr-only">{formatOccupancySpoken(props.ride)}</span>{" "}
               </b>
             </p>
           </div>
@@ -96,7 +104,7 @@ export const Modal = (props: IModalProps) => {
         {props.ride.obs && (
           <div className="h-12 flex items-center rounded-lg bg-surface-tertiary border-l-4 border-primary-default px-3 max-w-full">
             <p className="text-sm text-text-secondary italic truncate">
-              "{props.ride.obs}"
+              <span className="sr-only">Observação: </span>"{props.ride.obs}"
             </p>
           </div>
         )}

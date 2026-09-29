@@ -30,6 +30,7 @@ export const RadioVehicle = ({label, value, ...props}: ICheckboxProps) => {
   return (
     <label
       className={`p-3 h-20 rounded-xl w-full max-w-25 cursor-pointer flex items-center justify-center gap-2 text-base font-medium transition-all flex-col bg-surface-primary
+        has-focus-visible:ring-2 has-focus-visible:ring-primary-default has-focus-visible:ring-offset-2
         ${currentStyle.text}
         border
         ${currentStyle.border}`}

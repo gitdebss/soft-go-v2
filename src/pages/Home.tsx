@@ -128,6 +128,11 @@ function Home() {
           ))}
         </ul>
 
+        {/* A página não tem nenhum outro heading antes disso: sem ele, quem
+            navega por título (tecla H) não tem como pular direto para o
+            mural, só ler tudo em sequência até chegar aqui. */}
+        <h2 className="sr-only">Corridas disponíveis</h2>
+
         {rides?.length === 0 ? (
           <div className="flex flex-col w-full justify-center h-full items-center pt-7 gap-4">
             <Road className="h-15 w-15 text-text-secondary" />

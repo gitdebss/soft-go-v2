@@ -27,7 +27,12 @@ export const Textarea = ({
           className={hideLabel ? "sr-only" : "block mb-1 text-sm font-medium text-text-secondary"}
         >
           {label}{" "}
-          {textareaProps.required && <span className="text-red-700">*</span>}{" "}
+          {textareaProps.required && (
+            <span className="text-red-700">
+              <span aria-hidden="true">*</span>
+              <span className="sr-only"> (obrigatório)</span>
+            </span>
+          )}{" "}
         </label>
       )}
 

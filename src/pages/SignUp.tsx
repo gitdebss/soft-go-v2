@@ -77,7 +77,7 @@ function SignUp() {
             id="name"
             label="Nome"
             type="text"
-            placeholder="Ex: João da Silva"
+            placeholder="Exemplo: João da Silva"
             required
             error={errors.name?.message}
           />
@@ -86,7 +86,7 @@ function SignUp() {
             id="email"
             label="E-mail"
             type="email"
-            placeholder="Ex: joao@email.com"
+            placeholder="Exemplo: joao@email.com"
             required
             error={errors.email?.message}
           />
@@ -95,7 +95,7 @@ function SignUp() {
             id="phone"
             label="WhatsApp (opcional)"
             type="text"
-            placeholder="Ex: (51) 99999-9999"
+            placeholder="Exemplo: (51) 99999-9999"
             required={false}
             error={errors.phone?.message}
           />

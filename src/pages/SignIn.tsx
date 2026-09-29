@@ -67,7 +67,7 @@ function SignIn() {
             id="email"
             label="E-mail"
             type="email"
-            placeholder="Ex: joao@email.com"
+            placeholder="Exemplo: joao@email.com"
             required
             error={errors.email?.message}
           />

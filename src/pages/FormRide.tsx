@@ -132,7 +132,7 @@ function FormRide() {
               {...register("city")}
               label="Saindo de (cidade)"
               type="text"
-              placeholder="Ex: São Paulo"
+              placeholder="Exemplo: São Paulo"
               required={true}
               error={errors.city?.message}
             />
@@ -140,7 +140,7 @@ function FormRide() {
               {...register("complement")}
               label="Complemento (Bairro/Ponto)"
               type="text"
-              placeholder="Ex: Metrô Vila Madereira"
+              placeholder="Exemplo: Metrô Vila Madereira"
               required={false}
               helpText="Opcional para facilitar o encontro."
               error={errors.complement?.message}
@@ -155,7 +155,10 @@ function FormRide() {
 
             <label className="block mb-1 text-sm font-medium text-text-secondary">
               Tipo de Transporte
-              <span className="text-red-700"> *</span>
+              <span className="text-red-700">
+                <span aria-hidden="true"> *</span>
+                <span className="sr-only"> (obrigatório)</span>
+              </span>
             </label>
             <ul className="flex gap-3 justify-center">
               {radioVehicleOptions.map((option) => (
@@ -184,7 +187,7 @@ function FormRide() {
                 })}
                 label="Número de vagas"
                 type="number"
-                placeholder="Ex: 4"
+                placeholder="Exemplo: 4"
                 required={true}
                 error={errors.totalSpots?.message}
               />
@@ -199,7 +202,7 @@ function FormRide() {
             <Textarea
               {...register("obs")}
               label="Observação"
-              placeholder="Ex: Vou passar na padaria antes, dividimos pedágio..."
+              placeholder="Exemplo: Vou passar na padaria antes, dividimos pedágio..."
               required={false}
               error={errors.obs?.message}
             />

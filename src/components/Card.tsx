@@ -16,6 +16,8 @@ import { PassengerList } from "./PassengerList";
 import { ConfirmCancelRideModal } from "./ConfirmCancelRideModal";
 import { ConfirmCancelPresenceModal } from "./ConfirmCancelPresenceModal";
 import { classifyRide } from "../utils/classifyRide";
+import { formatOccupancyVisible, formatOccupancySpoken } from "../utils/formatOccupancy";
+import { formatSpokenDate } from "../utils/formatSpokenDate";
 
 interface ICardProps{
   ride: IRide,
@@ -45,7 +47,11 @@ const rideService = new RideService();
 export const Card = (props: ICardProps) => {
   const ride = props.ride
 
-  const badgeProps = { label: ride.transportType.name, style: ride.transportType.id };
+  const badgeProps = {
+    label: ride.transportType.name,
+    style: ride.transportType.id,
+    context: "Tipo de transporte",
+  };
   const confirmationButton = confirmationButtonState(ride);
   const isCanceled = ride.status === "canceled";
   // Cancelar uma carona que já aconteceu não tem efeito útil; a Home nunca
@@ -151,6 +157,16 @@ export const Card = (props: ICardProps) => {
       }`}
       key={ride.id}
     >
+      {/* Texto de verdade, não `aria-label` no card: um `aria-label` num
+          elemento sem role de widget (uma `<li>` de lista comum) só é lido em
+          navegação por Tab ou por comandos de objeto, não na leitura contínua
+          - foi exatamente o que falhou no asterisco e no badge. `sr-only`
+          aqui é conteúdo real, sempre lido, e primeiro no DOM de propósito:
+          quem usa leitor de tela precisa saber que a carona caiu antes de
+          ouvir nome, cidade, data etc. O aviso visível continua embaixo, na
+          posição de sempre - só quem enxerga lê nessa ordem. */}
+      {isCanceled && <span className="sr-only">Carona cancelada. </span>}
+
       <div className="flex flex-row justify-between">
         <div className="flex items-center flex-row gap-3">
           <Avatar initials={getInitials(ride.name)} />
@@ -182,22 +198,34 @@ export const Card = (props: ICardProps) => {
           <p>
             Saindo de <b>{ride.city}</b>
           </p>
-          { ride.complement && <p className="inline text-primary-default">• {ride.complement}</p>}{''}
+          { ride.complement && (
+            <p className="inline text-primary-default">
+              <span aria-hidden="true">• </span>
+              {ride.complement}
+            </p>
+          )}{''}
         </div>
 
         <div className="flex flex-row items-center text-sm justify-between">
           <div className="flex gap-2">
             <Clock className="h-4 w-4" />
             <p>
-              {format(new Date(`${ride.date}T00:00:00`), 'dd/MM/yyyy')} às {ride.hour}
+              {/* Leitor de tela soletra "29/09/2026" número a número; a
+                  versão por extenso fica só para ele, o texto curto continua
+                  o que aparece na tela. */}
+              <span aria-hidden="true">
+                {format(new Date(`${ride.date}T00:00:00`), 'dd/MM/yyyy')} às {ride.hour}
+              </span>
+              <span className="sr-only">
+                {formatSpokenDate(ride.date)} às {ride.hour}
+              </span>
             </p>
           </div>
           <div className="flex gap-2">
             <Users className="h-4 w-4 inline" />
             <p>
-              {ride.totalSpots === null
-                ? `${ride.occupiedSpots} confirmadas`
-                : `${ride.occupiedSpots}/${ride.totalSpots} Vagas`}
+              <span aria-hidden="true">{formatOccupancyVisible(ride)}</span>
+              <span className="sr-only">{formatOccupancySpoken(ride)}</span>
             </p>
           </div>
         </div>
@@ -205,13 +233,11 @@ export const Card = (props: ICardProps) => {
         {ride.obs && (
           <div className="h-12 flex items-center rounded-lg bg-surface-tertiary border-l-4 border-primary-default px-3 max-w-full">
             <p className="text-sm text-text-secondary italic truncate">
-              "{ride.obs}"
+              <span className="sr-only">Observação: </span>"{ride.obs}"
             </p>
           </div>
         )}
 
-        {/* Sem canal de notificação no app, o card é como quem confirmou
-            presença descobre que a carona caiu. */}
         {isCanceled && (
           <div className="flex gap-2 items-center rounded-lg bg-surface-secondary border border-border-default p-3">
             <CircleOff className="h-4 w-4 shrink-0 text-text-secondary" />

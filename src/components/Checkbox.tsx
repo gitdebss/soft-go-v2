@@ -24,6 +24,7 @@ export const Checkbox = (props: ICheckboxProps) => {
   return (
     <label
       className={`pt-2 pb-2 pr-4 pl-4 rounded-4xl w-fit cursor-pointer
+        has-focus-visible:ring-2 has-focus-visible:ring-primary-default has-focus-visible:ring-offset-2
         ${currentStyle.bg}
         ${currentStyle.text}
         border

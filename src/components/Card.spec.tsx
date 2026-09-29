@@ -389,11 +389,13 @@ describe("Card layout", () => {
     renderCard({ isOwner: true });
 
     const cancelButton = screen.getByRole("button", { name: /^cancelar carona$/i });
-    const badge = screen.getByText("Carro");
 
-    // O nome acessível vem do aria-label: o botão não carrega texto visível.
+    // O nome acessível do botão vem do aria-label: não carrega texto visível.
+    // O badge fica ao lado dele no mesmo container (a busca por texto não
+    // aponta mais direto para o wrapper do Badge: "Carro" agora é o span
+    // aria-hidden aninhado dentro dele, versão do texto para quem enxerga).
     expect(cancelButton.textContent?.trim()).toBe("");
-    expect(badge.parentElement).toContainElement(cancelButton);
+    expect(cancelButton.parentElement).toHaveTextContent("Carro");
   });
 
   // Crescer dentro do card esticaria a linha inteira da grade no desktop e

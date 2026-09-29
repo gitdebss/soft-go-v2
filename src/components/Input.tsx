@@ -38,7 +38,12 @@ export const Input = ({
           }
         >
           {label}{" "}
-          {inputProps.required && <span className="text-red-700">*</span>}{" "}
+          {inputProps.required && (
+            <span className="text-red-700">
+              <span aria-hidden="true">*</span>
+              <span className="sr-only"> (obrigatório)</span>
+            </span>
+          )}{" "}
         </label>
       )}
 
