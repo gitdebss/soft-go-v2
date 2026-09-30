@@ -30,12 +30,15 @@ export const signUpSchema = z
       }),
 
     // Telefone é opcional: quem não informar simplesmente não exibe botão de
-    // WhatsApp. Mesma regra e mensagem já usadas em rideSchema.
+    // WhatsApp. A validação ignora como a usuária formatou o número (com ou
+    // sem parênteses, espaço, traço) e checa só os dígitos: DDD (2) + 9 +
+    // mais 8 dígitos. A limpeza para dígitos puros (AD-002) acontece depois,
+    // no submit (SignUp.tsx) e de novo no backend - aqui só validamos.
     phone: z
       .string()
       .transform((value) => value.trim())
       .refine(
-        (value) => value === "" || /^\(\d{2}\) 9\d{4}-\d{4}$/.test(value),
+        (value) => value === "" || /^\d{2}9\d{8}$/.test(value.replace(/\D/g, "")),
         "Informe um celular válido. Ex: (51) 99999-9999",
       )
       .optional(),

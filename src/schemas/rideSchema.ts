@@ -21,7 +21,8 @@ const rideObjectSchema = z.object({
   city: z
     .string()
     .min(1, "A cidade é obrigatória")
-    .min(3, "A cidade deve ter pelo menos 3 caracteres"),
+    .min(3, "A cidade deve ter pelo menos 3 caracteres")
+    .max(100, "A cidade deve ter no máximo 100 caracteres"),
 
   complement: z.string().optional(),
 
