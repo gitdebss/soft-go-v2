@@ -30,6 +30,22 @@ describe("signUpSchema", () => {
     expect(result.success).toBe(true);
   });
 
+  it("accepts plain digits with no formatting at all (JOIN-12)", () => {
+    const result = signUpSchema.safeParse(validData({ phone: "51999999999" }));
+
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts formatting that doesn't match the placeholder exactly, as long as the digits are a valid number (JOIN-12)", () => {
+    const variants = ["51 99999-9999", "51-99999-9999", "(51)99999-9999"];
+
+    for (const phone of variants) {
+      const result = signUpSchema.safeParse(validData({ phone }));
+
+      expect(result.success).toBe(true);
+    }
+  });
+
   it("rejects a mobile number that does not start with 9 after the area code (JOIN-12)", () => {
     const result = signUpSchema.safeParse(validData({ phone: "(51) 88888-8888" }));
 

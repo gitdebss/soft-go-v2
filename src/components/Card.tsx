@@ -33,10 +33,9 @@ interface ICardProps{
 // para não competir visualmente com o "primary" de quem ainda vai confirmar.
 function confirmationButtonState(
   ride: IRide,
-): { label: string; disabled: boolean; style: "primary" | "tertiary" } {
+): { label: string; disabled: boolean; style: "primary" | "tertiary" | "disabled"} {
   if (ride.alreadyJoined) return { label: "Cancelar presença", disabled: false, style: "tertiary" };
-  // `availableSpots` nulo é capacidade ilimitada (ônibus): nunca lota.
-  if (ride.availableSpots === 0) return { label: "Vou junto", disabled: true, style: "primary" };
+  if (ride.availableSpots === 0) return { label: "Vagas preenchidas", disabled: true, style: "disabled" };
 
   return { label: "Vou junto", disabled: false, style: "primary" };
 }
